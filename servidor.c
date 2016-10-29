@@ -15,6 +15,10 @@
   
 #define PORT 8888
 #define MAXc 10
+
+typedef struct Cajeros{
+
+}
 int main(int argc , char *argv[])
 {
 
@@ -30,6 +34,8 @@ int main(int argc , char *argv[])
     // Declaramos el set de descriptores de los sockets.
     fd_set readfds;
     
+
+
     //a message
     char *msj = "Conexion Satisfactoria. \n";
   
