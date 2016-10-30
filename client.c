@@ -22,7 +22,7 @@ void getTime(char *buffer){
     struct tm* tm_info;
     time(&timer);
     tm_info = localtime(&timer);
-    strftime(buffer, 26, "%Y/%m/%d %H:%M", tm_info);
+    strftime(buffer, 26, "%Y/%m/%d-%H:%M", tm_info);
 }
 
 int numRetiros(char * filename,char* id){
