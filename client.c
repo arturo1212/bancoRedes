@@ -135,7 +135,7 @@ int main(int argc, char* argv[]){
 	char tipo[5], monto[5],id[20], nombreReal[256],fecha[256];
 	char buffer[1024], msj[1024], linea[1024];	
 	char nombre[256];
-
+	char *localhost = "127.0.0.1";
 	// SOCKETS
 	struct sockaddr_in serverAddr;
 	struct timeval tv;
@@ -160,7 +160,13 @@ int main(int argc, char* argv[]){
 	}
 	// Obtener argumentos
 	procesar_argumentos(ipsrvrstr,puertostr,tipo,monto,id,argv);
-	resolvDir(ipsrvrstr, nombreReal);
+	if(strcmp(ipsrvrstr,localhost)){
+		resolvDir(ipsrvrstr, nombreReal);		
+	}
+	else{
+		sprintf(nombreReal,"%s",localhost);
+	}
+
 	
 	// FECHA
 	getTime(fecha);
@@ -201,7 +207,7 @@ int main(int argc, char* argv[]){
 	//  Colocar los datos del servidor
 	serverAddr.sin_family = AF_INET;
 	serverAddr.sin_port = htons(atoi(puertostr));								// Cambiar puerto tambien
-	serverAddr.sin_addr.s_addr = INADDR_ANY;						// CAMBIAR AQUI
+	serverAddr.sin_addr.s_addr = inet_addr(nombreReal);						// CAMBIAR AQUI
 	memset(serverAddr.sin_zero, '\0', sizeof serverAddr.sin_zero);
 
 	/*------------------------- Conexion con el servidor ---------------------*/
