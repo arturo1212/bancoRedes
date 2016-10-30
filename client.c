@@ -219,7 +219,7 @@ int main(int argc, char* argv[]){
 	
 	/*------------------------------ Revision de nombre ----------------------*/
 	// Abrimos el archivo 
-	fp = fopen("cajeroV.txt", "w+");
+	fp = fopen("cajeroV.txt", "a+");
 	readline(fp,linea);
 	if(linea[0]!='\0'){
 		sprintf(nombre,"%s",linea);
