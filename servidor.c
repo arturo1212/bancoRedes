@@ -27,7 +27,7 @@ void inicializar (cajero C[]){
     }
 }
 
-void procesar_transaccion(char *buffer,cajero C[],int sckt_fd){
+void procesar_transaccion(char *buffer,cajero C[],int sckt_fd, char *depotfile, char * retirfile){
     char nombre[20],fecha[16]/*o 17*/,id[20],tipoc,
          *tipor = "Retiro",
          *tipod = "Deposito";
@@ -56,7 +56,7 @@ void procesar_transaccion(char *buffer,cajero C[],int sckt_fd){
                 perror("Fallo en envio de confirmacion retiro.");
                 exit(1);
             }
-            if((fd_retiro = fopen("Retiro.txt", "a+") )== NULL){
+            if((fd_retiro = fopen(retirfile, "a+") )== NULL){
                 perror("Error abriendo log deposito.");
                 exit(1);
             }
@@ -79,7 +79,7 @@ void procesar_transaccion(char *buffer,cajero C[],int sckt_fd){
                 perror("Fallo en envio de confirmacion deposito.");
                 exit(1);
             }
-        if((fd_deposito = fopen("Deposito.txt", "w+") )== NULL){
+        if((fd_deposito = fopen(depotfile, "w+") )== NULL){
             perror("Error abriendo log deposito.");
             exit(1);
         }
@@ -96,20 +96,20 @@ void procesar_transaccion(char *buffer,cajero C[],int sckt_fd){
 // LECTURA DE PARAMETROS
  /*
     PUERTO
-    BITACORA ENTRADA
-    BITACORA SALIDA
+    BITACORA depotfile
+    BITACORA retirfile
  */
-void procesarArgumentos(char* argv[],char *port, char *entrada, char *salida){
+void procesarArgumentos(char* argv[],char *port, char *depotfile, char *retirfile){
     for(int i = 1;i<=7;i+=2){
         if(argv[i][1]=='l'){
             sprintf(port,"%s",argv[i+1]);
         }
         else if((argv[i][1]=='i')){
-            sprintf(entrada,"%s",argv[i+1]);           
+            sprintf(depotfile,"%s",argv[i+1]);           
         }            
 
-        else if(argv[i][1]=='l'){
-            sprintf(entrada,"%s",argv[i+1]);
+        else if(argv[i][1]=='o'){
+            sprintf(retirfile,"%s",argv[i+1]);
         }
     }
 }
@@ -127,7 +127,7 @@ int main(int argc , char *argv[])
     int max_sd, activity, i , valread , sd;
 
     // STRINGS Y CARACTERES 
-    char buffer[1025], entrada[1025], salida[1025], port[10];
+    char buffer[1025], depotfile[1025], retirfile[1025], port[10];
     char *msj = "Conexion Satisfactoria. \n";
 
     // DESCRIPTORES.
@@ -137,7 +137,7 @@ int main(int argc , char *argv[])
     struct sockaddr_in address;
 
     /*-------------------------- Argumentos ------------------------------*/
-    procesarArgumentos(argv, port, entrada, salida);
+    procesarArgumentos(argv, port, depotfile, retirfile);
     PORT = atoi(port); 
 
 
@@ -242,7 +242,7 @@ int main(int argc , char *argv[])
                 }
                 else
                 {   
-                    procesar_transaccion(buffer,clientes,sd);
+                    procesar_transaccion(buffer,clientes,sd,depotfile,retirfile);
                     //buffer[valread] = '\0';
                     //puts(buffer);
                     //send(sd , buffer , strlen(buffer) , 0 );
