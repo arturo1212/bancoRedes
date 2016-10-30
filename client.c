@@ -200,7 +200,7 @@ int main(int argc, char* argv[]){
 
 	// Definimos el timeout en los sockets
 	setsockopt(clientSocket, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv));
-	setsockopt(clientSocket, SOL_SOCKET, SO_SNDTIMEO, &tv, sizeof(tv));
+	//setsockopt(clientSocket, SOL_SOCKET, SO_SNDTIMEO, NULL,NULL);
 	//  Colocar los datos del servidor
 	serverAddr.sin_family = AF_INET;
 	serverAddr.sin_port = htons(atoi(puertostr));								// Cambiar puerto tambien
@@ -215,12 +215,6 @@ int main(int argc, char* argv[]){
         perror("Error conectando al servidor");
         exit(EXIT_FAILURE);			
 	}
-
-	// Esperar respuesta del servidor.
-	memset(buffer, '\0', sizeof buffer);			// Limpiar el buffer
-	recv(clientSocket, buffer, 1024, 0);			// Recibir el mensaje.
-	printf("Mensaje: %s\n",buffer);					// Mostrar el mensaje.
-
 	
 	/*------------------------------ Revision de nombre ----------------------*/
 	// Abrimos el archivo 
@@ -233,7 +227,6 @@ int main(int argc, char* argv[]){
 	else{
 		nombre = "-";
 	}
-	printf("Mi nombre es: %s\n", nombre );
 
 	/*---------------------------------  Transaccion --------------------------*/
 	memset(buffer, '\0', sizeof buffer);						// Limpieza del buffer
@@ -241,6 +234,18 @@ int main(int argc, char* argv[]){
 	send(clientSocket, msj,strlen(msj),0);						// Enviar mensaje
 	printf("Esperando respuesta del servidor...\n");			// Mensaje al Usuario.
 	// Esperar respuesta del servidor 	
+	// Esperar respuesta del servidor.
+	memset(buffer, '\0', sizeof buffer);			// Limpiar el buffer
+	
+	if (nombre[0]=='-'){
+		if (recv(clientSocket, buffer, 1024, 0)<0){			// Recibir el mensaje.
+			perror("No se recibe respuesta");		
+        	exit(EXIT_FAILURE);
+    	}
+		sprintf(nombre,"%s",buffer);
+		printf("Mi nombre es: %s\n", nombre );					// Mostrar el mensaje.
+	}
+
 	if (recv(clientSocket, buffer, 1024, 0)<0){	
         perror("No se recibe respuesta");		
         exit(EXIT_FAILURE);			
