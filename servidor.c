@@ -26,6 +26,7 @@ void inicializar (cajero C[]){
         C[i].nombre = 0;        
     }
 }
+
 int get_index_of(int name, cajero C[]){
     int i = 0;
     for (;i>MAXc;i++){
@@ -35,6 +36,7 @@ int get_index_of(int name, cajero C[]){
     }
     return -1;
 }
+
 int get_max_client(cajero C[]){
     int i = 0,max = 0;
     for (;i>MAXc;i++){
@@ -44,6 +46,7 @@ int get_max_client(cajero C[]){
     }
     return max;
 }
+
 void procesar_transaccion(char *buffer,cajero C[],int sckt_fd, char *depotfile, char * retirfile){
     char nombre[20],fecha[16]/*o 17*/,id[20],tipoc,
          *tipor = "Retiro",
@@ -101,8 +104,8 @@ void procesar_transaccion(char *buffer,cajero C[],int sckt_fd, char *depotfile, 
             perror("Error abriendo log deposito.");
             exit(1);
         }
-        fprintf(fd_diario,"%s por el usurio %s de monto %d el %s en el cajero %d\n",tipod,id,monto,fecha,C[i].nombre);
-        fprintf(fd_deposito,"%s por el usurio %s de monto %d el %s en el cajero %d\n",tipod,id,monto,fecha,C[i].nombre);
+        fprintf(fd_diario,"%s por el usuario %s de monto %d el %s en el cajero %d\n",tipod,id,monto,fecha,C[i].nombre);
+        fprintf(fd_deposito,"%s por el usuario %s de monto %d el %s en el cajero %d\n",tipod,id,monto,fecha,C[i].nombre);
         C[i].total += monto;
         fclose(fd_deposito);
     }
@@ -113,12 +116,7 @@ void procesar_transaccion(char *buffer,cajero C[],int sckt_fd, char *depotfile, 
         //readline(fp,linea);
     //}
 }
-// LECTURA DE PARAMETROS
- /*
-    PUERTO
-    BITACORA depotfile
-    BITACORA retirfile
- */
+
 void procesarArgumentos(char* argv[],char *port, char *depotfile, char *retirfile){
     for(int i = 1;i<=5;i+=2){
         if(argv[i][1]=='l'){
@@ -163,7 +161,7 @@ int main(int argc , char *argv[])
     }
     procesarArgumentos(argv, port, depotfile, retirfile);
     PORT = atoi(port); 
-
+    puts("Pase por aqui");
 
 
     /*----------------------- Acondicionar el entorno --------------------*/
