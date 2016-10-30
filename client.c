@@ -24,6 +24,20 @@ time_t timer;
     strftime(buffer, 26, "%Y/%m/%d %H:%M", tm_info);
 }
 
+int numRetiros(char * filename,char* id){
+  int  result = 0;
+  char buffer[10];
+  FILE *fp;
+  fp = fopen(filename, "r+");
+  while(fscanf(fp,"%s\n", buffer) > 0){
+      if(strcmp(buffer,id)==0){
+        result += 1;
+      }    
+  }
+  fclose(fp);
+  return result;
+}
+
 int readline(FILE *f, char *buffer){
    char c; 
    int i;
