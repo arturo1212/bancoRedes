@@ -12,12 +12,13 @@
 #include <time.h>
 #include <netdb.h>
 
-#define MAX_NOMBR 256
+#define   MAX_NOMBR 256
 #ifndef   NI_MAXHOST
 #define   NI_MAXHOST 1025
 #endif
+
 void getTime(char *buffer){
-time_t timer;
+	time_t timer;
     struct tm* tm_info;
     time(&timer);
     tm_info = localtime(&timer);
@@ -28,7 +29,7 @@ int numRetiros(char * filename,char* id){
   int  result = 0;
   char buffer[10];
   FILE *fp;
-  fp = fopen(filename, "r+");
+  fp = fopen(filename, "a+");
   while(fscanf(fp,"%s\n", buffer) > 0){
       if(strcmp(buffer,id)==0){
         result += 1;
@@ -82,6 +83,15 @@ int resolvDir(char* dir, char* ret){
             sprintf(ret,"%s",hostname);
             return 0;
     }   
+}
+
+void writeLine(char * filename,char* id){
+	int  result = 0;
+  	char buffer[10];
+  	FILE *fp;
+	fp = fopen(filename, "a+");
+	fprintf(fp, "%s\n", id);
+	fclose(fp);
 }
 
 
@@ -143,7 +153,7 @@ int main(int argc, char* argv[]){
 	tv.tv_usec = 0;
 	
 	// ARCHIVOS
-	FILE *fp;
+	FILE *fp, *retiros;
 
 	// ENTEROS
 	int clientSocket, total, puerto;	// Socket del cliente
@@ -160,6 +170,15 @@ int main(int argc, char* argv[]){
 	resolvDir(ipsrvrstr, nombreReal);
 	getTime(fecha);
 
+	// Ver, si es un retiro, si es el cuarto.
+	if(numRetiros("retiros.txt",id) >= 3 && tipo == 'r'){
+		printf("No puede realizar mas retiros por hoy.");
+		exit(0);	
+	}
+	// Si es un retiro, agregarlo a la lista.
+	if(tipo == 'r'){
+		writeLine("retiros.txt",id);
+	}
 
 	/*--------------------------Establecer la conexion------------------------*/
 	// Creacion del socket.
