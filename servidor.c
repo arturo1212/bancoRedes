@@ -29,6 +29,15 @@ void inicializar (cajero C[]){
     }
 }
 
+void procesar_transaccion(char *buffer,cajero C[],int sckt_fd){
+    char nombre[20],fecha[16]/*o 17*/,id[20],tipoc,
+         *tipor = "Retiro",
+         *tipod = "Deposito";
+    int monto;
+    sscanf(buffer,"%s|%s|%s|%c|%d|",nombre,fecha,id,&tipoc,&monto);
+
+}
+
 int main(int argc , char *argv[])
 {
     /*---------------------- Declaracion de Variables -------------------*/
@@ -142,7 +151,7 @@ int main(int argc , char *argv[])
         
             // Enviar mensaje de confirmacion.
             if( send(new_socket, msj, strlen(msj), 0) != strlen(msj) )  {
-                perror("Error enviando mensaje.");
+                perror("Error enviando mensaje de conexion.");
             }
             // Agregar el socket a la lista.
             for (i = 0; i < MAXc; i++){
@@ -163,10 +172,11 @@ int main(int argc , char *argv[])
                     clientS[i] = 0;
                 }
                 else
-                {
-                    buffer[valread] = '\0';
-                    puts(buffer);
-                    send(sd , buffer , strlen(buffer) , 0 );
+                {   
+                    procesar_transaccion(buffer,clientes,sd);
+                    //buffer[valread] = '\0';
+                    //puts(buffer);
+                    //send(sd , buffer , strlen(buffer) , 0 );
                 }
             }
         }
