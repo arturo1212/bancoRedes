@@ -36,7 +36,7 @@ void procesar_transaccion(char *buffer,cajero C[],int sckt_fd, char *depotfile, 
     sscanf(buffer,"%s|%s|%s|%c|%d|",nombre,fecha,id,&tipoc,&monto);
     //RECORDAR QUE LOS ARCHIVOS DE AQUI SON PARAMENTROS DE LLAMADA
     //A EXCEPCION DEL DEIARIO
-    if((fd_diario = fopen("logDiario.txt", "w+") )== NULL){//Ver Cambiar nombre por dia
+    if((fd_diario = fopen("logDiario.txt", "a+") )== NULL){//Ver Cambiar nombre por dia
         perror("Error abriendo log diario.");
         exit(1);
     }
@@ -79,7 +79,7 @@ void procesar_transaccion(char *buffer,cajero C[],int sckt_fd, char *depotfile, 
                 perror("Fallo en envio de confirmacion deposito.");
                 exit(1);
             }
-        if((fd_deposito = fopen(depotfile, "w+") )== NULL){
+        if((fd_deposito = fopen(depotfile, "a+") )== NULL){
             perror("Error abriendo log deposito.");
             exit(1);
         }
