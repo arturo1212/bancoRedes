@@ -1,0 +1,68 @@
+ASIGNACION 1: Sockets
+
+Integrantes:
+	David Hernández 12-10761
+	Arturo Toro     12-10796
+
+Estructura y Archivos:
+		El proyecto está compuesto de 3 archivos: client.c, servidor.c y makefile.
+	A continuación se proporciona una breve descripción del contenido y la funcion 
+	de cada archivo:
+
+	- client.c : Contiene todas las funciones necesarias para el funcionamiento
+				del cliente. En este sentido, contiene las siguientes funciones:
+
+		.- getTime:    Permite obtener la hora en la que se realiza la transacción.
+		.- numRetiros: Permite ver cuántos retiros ha realizado alguien.
+		.- readLine:   Permite leer una linea de un archivo.
+		.- writeLine:  Permite escribir una linea en un archivo.
+		.- resolvDir:  Permite obtener la dirección IP del servidor remoto.
+		.- procesarArgumentos: Permite procesar los argumentos de la llamada.
+		.- main:       Ejecuta el algoritmo en el cual está implementado el
+					   protocolo de comunicación del cliente.
+
+	- servidor.c: 
+
+	- makefile : Permite compilar y enlazar los archivos necesarios para producir
+				 los ejecutables.
+
+	Al ejecutar el Makefile, se obtienen dos archivos ejecutables llamados "cliente" y "servidor"
+	El "cliente" es el que se ejecuta en los cajeros automáticos y permite al usuario especificar
+	transacciones que serán transmitidas al servidor central en busca de autorización.
+
+	El "servidor" recibe los mensajes de todos los clientes de manera recurrente, realiza las va-
+	lidaciones correspondientes y completa las bitácoras de transacciones para ser utilizadas por
+	los administradores. En el servidor se mantiene el monto total disponible de cada cajero.
+
+Intrucciones para la ejecución:
+	Después de compilar y enlazar los archivos necesarios utilizando el makefile proporcionado,
+	debe iniciarse el servidor de la siguiente manera:
+
+	- Ejecute el siguiente comando en el terminal:
+	./bsb_svr -l <puerto_bsb_svr> -i <bitácora_entrada> - o <bitácora_salida>
+
+	Luego, para ejecutar un cliente use: 
+	./bsb_cli -d <nombre_módulo_atención> -p <puerto_bsb_svr> - c <op> -i <codigo_usuario> -m <monto>
+
+	Aquí, <monto> representa la cifra a retirar o depositar.
+	Nota: si desea ejecutar múltiples clientes en la misma computadora, el archivo ejecutable debe
+	ser replicado en carpetas diferentes.
+
+Condiciones particulares:
+	- El id del usuario está compuesto de puros números y puede ser de máximo 9 dígitos, esta decisión
+	se toma pensando en el número de cédula como identificador único para cada persona.
+	- Debido a que cada cajero necesita un nombre para que el servidor sea capaz de identificarlo, se
+	considera que usar la IP del cajero como nombre es inadecuado. puesto que no hay garantías de que
+	la asignación de IP sea estática. Por esto, el cliente mantiene un archivo de texto con su nombre.
+	Dicho nombre es asignado por el servidor en la primera conexión que se realiza.
+	- Como no se especifica si se pueden hacer mas de 3 retiros cuyos montos sean menores a 3000, se
+	limita el número máximo de retiros a 3, sin importar el monto.
+	- Para poder verificar que un usuario no retire mas de 3 veces, se usa un archivo auxiliar.
+	- Para evitar que la información de cada cliente se pierda en caso de que el servidor falle,
+	se mantienen los datos en un archivo de texto plano.
+	- Se emplearon timeouts de 10 segundos para esperar las respuestas.
+	- En caso de transacciones exitosas, el cliente imprime un mensaje con los datos por terminal.
+	- Por la sintaxis especificada, se asume que hay que ejecutar el cliente para cada transacción.
+	- Para cada posible fallo se muestra el mensaje de error correspondiente.
+	- Se asume que no hay monto tope para la cantidad de depósitos que pueden hacerse.
+	- El servidor admite un máximo de 10 conexiones simultáneas.
