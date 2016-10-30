@@ -10,6 +10,8 @@
 #include <netinet/in.h>
 #include <sys/time.h>
 #include <time.h>
+#include <netdb.h>
+
 #define MAX_NOMBR 256
 
 void getTime(char *buffer){
@@ -44,8 +46,31 @@ int readline(FILE *f, char *buffer){
    return -1; 
 }
 
-void procesar_argumentos(char* srvr, char* port,char* op,char* monto, char* id,char* argv[]){
-	for(int i = 1;i<sizeof(argv)-1;i+=2){
+int resolvDir(char* dir, char* ret){
+    struct addrinfo* result;
+    struct addrinfo* res;
+    int error;
+    if (getaddrinfo(dir, NULL, NULL, &result) != 0){
+        perror("no pude resolver");
+        exit(EXIT_FAILURE);
+        return -1;
+    } 
+    for (res = result; res != NULL; res = res->ai_next) {   
+        char hostname[NI_MAXHOST];
+        error = getnameinfo(res->ai_addr, res->ai_addrlen, hostname, NI_MAXHOST, NULL, 0, 0); 
+        if (error != 0) {
+            fprintf(stderr, "error in getnameinfo: %s\n", gai_strerror(error));
+            continue;
+        }
+        if (*hostname != '\0')
+            sprintf(ret,"%s",hostname);
+            return 0;
+    }   
+}
+
+
+void procesar_argumentos(char* srvr, char* port,char* op,char* monto, char* id,char* argv[],int argc){
+	for(int i = 1;i<argc;i+=2){
 		if(argv[i][1]=='d'){
 			sprintf(srvr,"%s",argv[i+1]);
 
@@ -71,32 +96,49 @@ void procesar_argumentos(char* srvr, char* port,char* op,char* monto, char* id,c
 }
 
 int main(int argc, char* argv[]){
+	/*---------------------- Declaracion de Variables -------------------------*/
+	/* STRINGS Y CARACTERES
+	  	ipsrvrstr : ip o nombre del servidor
+		puertostr : puerto del servidor
+		tipo	  : tipo de transaccion
+		monto	  : monto de la transaccion
+		id        : id del usuario
+		nombreReal: ip definitiva
+	*/
+	char *ipsrvrstr,*puertostr;
+	char tipo, monto[5],id[20], nombreReal[256],fecha[256];
+	char buffer[1024], msj[1024], linea[1024];	
+	char *nombre;
 
-	// Declaracion de Variables
-	FILE *fp;
-	char *nombre,fecha[256],tipo,monto[5],*ipsrvrstr,*puertostr;
-	char buffer[1024], id[20], msj[1024], linea[1024];
-	
-	int clientSocket, total, puerto;	// Socket del cliente
-
+	// SOCKETS
 	struct sockaddr_in serverAddr;
 	struct timeval tv;
 	socklen_t addr_size;
 
-	//Definimos el timeout
+	// TIMEOUT
 	tv.tv_sec = 10;
 	tv.tv_usec = 0;
+	
+	// ARCHIVOS
+	FILE *fp;
 
-	if (argc != 11){ //Si los argumentos estan incompletos mostrar el uso correcto
+	// ENTEROS
+	int clientSocket, total, puerto;	// Socket del cliente
+
+	/*------------------------------ VERIFICACIONES ---------------------------*/
+	// Numero correcto de argumentos
+	if (argc != 11){
 		fprintf(stderr, "Uso: bsb_cli -d <ip servidor> -p <puerto> -c <operacion> \
 							 -m <monto> -i <identificador>\n" );
 		exit(1);
-	}else{
-		procesar_argumentos(ipsrvrstr,puertostr,&tipo,monto,id,argv);
-
 	}
+	// Obtener los argumentos del terminal, la ip del servidor y la fecha
+	procesar_argumentos(ipsrvrstr,puertostr,&tipo,monto,id,argv,argc);
+	resolvDir(ipsrvrstr, nombreReal);
+	getTime(fecha);
 
-/*--------------------------Establecer la conexion------------------------*/
+
+	/*--------------------------Establecer la conexion------------------------*/
 	// Creacion del socket.
 	if ( (clientSocket = socket(PF_INET, SOCK_STREAM, 0)) == 0){
         perror("Error creando el socket");
@@ -108,11 +150,11 @@ int main(int argc, char* argv[]){
 	setsockopt(clientSocket, SOL_SOCKET, SO_SNDTIMEO, &tv, sizeof(tv));
 	//  Colocar los datos del servidor
 	serverAddr.sin_family = AF_INET;
-	serverAddr.sin_port = htons(8888);
-	serverAddr.sin_addr.s_addr = INADDR_ANY;
+	serverAddr.sin_port = htons(8888);								// Cambiar puerto tambien
+	serverAddr.sin_addr.s_addr = INADDR_ANY;						// CAMBIAR AQUI
 	memset(serverAddr.sin_zero, '\0', sizeof serverAddr.sin_zero);
 
-/*------------------------- Conexion con el servidor ---------------------*/
+	/*------------------------- Conexion con el servidor ---------------------*/
 
 	// Conectarse al servidor. 
 	addr_size = sizeof serverAddr;
@@ -120,40 +162,43 @@ int main(int argc, char* argv[]){
         perror("Error conectando al servidor");
         exit(EXIT_FAILURE);			
 	}
+
 	// Esperar respuesta del servidor.
-	memset(buffer, '\0', sizeof buffer);	// Limpiar el buffer
-	recv(clientSocket, buffer, 1024, 0);	// Recibir el mensaje.
+	memset(buffer, '\0', sizeof buffer);			// Limpiar el buffer
+	recv(clientSocket, buffer, 1024, 0);			// Recibir el mensaje.
 	printf("Mensaje: %s\n",buffer);					// Mostrar el mensaje.
 
-/*---------------------------------  Transaccion --------------------------*/
 	
-
+	/*------------------------------ Revision de nombre ----------------------*/
 	// Abrimos el archivo 
 	fp = fopen("cajeroV.txt", "w+");
-
-	// Verificar si tengo nombre
 	readline(fp,linea);
 	if(linea[0]!='\0'){
 		sprintf(nombre,"%s",linea);
 		readline(fp,linea);
-		total = atoi(linea);
 	}
 	else{
 		nombre = "-";
-		total = 80000;
 	}
-	getTime(fecha);
-	printf("%s\n",fecha);
-	sprintf(msj,"%s|%s|%s|%s|%s|",nombre,fecha,id,tipo,monto);
 
-	printf("Enviare el mensaje");
-	send(clientSocket, msj,strlen(msj),0);
-	memset(buffer, '\0', sizeof buffer);		// Limpiar el buffer
-	if (recv(clientSocket, buffer, 1024, 0)<0){	// Esperar respuesta del servidor 
+	/*---------------------------------  Transaccion --------------------------*/
+	memset(buffer, '\0', sizeof buffer);						// Limpieza del buffer
+	sprintf(msj,"%s|%s|%s|%d|%s|",nombre,fecha,id,tipo,monto);  // Creacion del mensaje
+	send(clientSocket, msj,strlen(msj),0);						// Enviar mensaje
+	printf("Esperando respuesta del servidor...\n");			// Mensaje al Usuario.
+	// Esperar respuesta del servidor 	
+	if (recv(clientSocket, buffer, 1024, 0)<0){	
         perror("No se recibe respuesta");		
         exit(EXIT_FAILURE);			
+	}
+	// Mostrar al usuario la respuesta del servidor.
+	if (buffer[1] == 'y'){
+		printf("Transaccion realizada con exito!\n")
+		//mostrar mensaje con cosas que hacen falta.
 	}	
-
+	else{
+		printf("No hay dinero disponible actualmente.")
+	}
 
   return 0;
 }

@@ -21,71 +21,58 @@ typedef struct Cajeros{
 }
 int main(int argc , char *argv[])
 {
-
+    /*---------------------- Declaracion de Variables -------------------*/
+    // ENTEROS
     int opt = 1;
-    // Creamos un arreglo de sockets para los clientes
     int masterS , addrlen , new_socket;
     int clientS[MAXc];
     int max_sd, activity, i , valread , sd;
-    struct sockaddr_in address;
-    // Especificamos el tamano maximo del buffer.  
-    char buffer[1025];
-      
-    // Declaramos el set de descriptores de los sockets.
-    fd_set readfds;
+
     
-
-
-    //a message
+    // STRINGS Y CARACTERES 
+    char buffer[1025];
     char *msj = "Conexion Satisfactoria. \n";
+
+    // DESCRIPTORES.
+    fd_set readfds;
+
+    // SOCKETS
+    struct sockaddr_in address;   
+
   
     for (i = 0; i < MAXc; i++) 
     {
         clientS[i] = 0;
     }
       
-    // Este socket espera nuevas conexiones.
-    if( (masterS = socket(AF_INET , SOCK_STREAM , 0)) == 0) 
-    {
+    // Creacion de socket maestro
+    if( (masterS = socket(AF_INET , SOCK_STREAM , 0)) == 0) {
         perror("Error en socket.");
         exit(EXIT_FAILURE);
     }
-    /*
-     SOL SOCKETS especifica que trabajamos a nivel de sockets. (Revisar)
-     REUSEADDR permite reusar la direccion local.
-     opt en TRUE indica el modo de las opciones seleccionadas.
-    */
-    if( setsockopt(masterS, SOL_SOCKET, SO_REUSEADDR, (char *)&opt, sizeof(opt)) < 0 )
-    {
+    // Propiedades socket maestro
+    if( setsockopt(masterS, SOL_SOCKET, SO_REUSEADDR, (char *)&opt, sizeof(opt)) < 0 ){
         perror("Error en config del socket.");
         exit(EXIT_FAILURE);
     }
-    /*
-     AF_INET es para usar protocolos ARPA de internet
-     INADDR_ANY coloca la ip del servidor.
-     htons() se usa para pasar a variable corta de red.
-        Aqui se especifica el puerto a utilizar.
-    */
     address.sin_family = AF_INET;
     address.sin_addr.s_addr = INADDR_ANY;
     address.sin_port = htons(PORT);       
       
-    // Asociamos el socket a la direccion especificada. 
-    if (bind(masterS, (struct sockaddr *)&address, sizeof(address)) < 0) 
-    {
+    // BIND: Asociamos el socket a la direccion especificada. 
+    if (bind(masterS, (struct sockaddr *)&address, sizeof(address)) < 0) {
         perror("Error en bind.");
         exit(EXIT_FAILURE);
     }
     printf("Escuchando el puerto %d \n", PORT);
      
-    // Especificamos el numero maximo de conexiones y escuchamos.
-    if (listen(masterS, MAXc) < 0)
-    {
+    // LISTEN: Numero maximo de conexiones y escuchar.
+    if (listen(masterS, MAXc) < 0){
         perror("Error en listen.");
         exit(EXIT_FAILURE);
     }
-      
-    // Guardamos el largo de la direccion para otras funciones.
+       
+    // Guardar el largo de la direccion para otras funciones.
     addrlen = sizeof(address);
     puts("Esperando conexiones");
     
