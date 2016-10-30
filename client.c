@@ -68,7 +68,6 @@ int resolvDir(char* dir, char* ret){
     struct addrinfo* res;
     int status;
     int error;
-    printf("OBTENIENDO DE: %s",dir);
     if ( (status = getaddrinfo(dir, NULL /*HACE FALTA PUERTO*/, NULL, &result)) != 0){
         fprintf(stderr, "Error getaddrinfo() : %s\n",gai_strerror(status) );
         exit(EXIT_FAILURE);
@@ -101,7 +100,6 @@ void procesar_argumentos(char* srvr, char* port,char* op,char* monto, char* id,c
 	for(int i = 1;i<=9;i+=2){
 		if(argv[i][1]=='d'){
 			sprintf(srvr,"%s",argv[i+1]);
-			printf("PARSEANDO ANDO: %s\n",srvr);
 		}else if(argv[i][1]=='p'){
 			sprintf(port,"%s",argv[i+1]);
 
@@ -162,7 +160,6 @@ int main(int argc, char* argv[]){
 	}
 	// Obtener argumentos
 	procesar_argumentos(ipsrvrstr,puertostr,&tipo,monto,id,argv);
-	printf("IP SERVIDOR: %s y %s\n",ipsrvrstr,puertostr);
 	resolvDir(ipsrvrstr, nombreReal);
 	
 	// FECHA
