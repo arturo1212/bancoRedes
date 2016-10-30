@@ -26,6 +26,15 @@ void inicializar (cajero C[]){
         C[i].nombre = 0;        
     }
 }
+int get_index_of(int name, cajero C[]){
+    int i = 0;
+    for (;i>MAXc;i++){
+        if(C[i].nombre == name){
+            return i;
+        }
+    }
+    return -1,
+}
 
 void procesar_transaccion(char *buffer,cajero C[],int sckt_fd, char *depotfile, char * retirfile){
     char nombre[20],fecha[16]/*o 17*/,id[20],tipoc,
