@@ -216,11 +216,6 @@ int main(int argc, char* argv[]){
         exit(EXIT_FAILURE);			
 	}
 
-	// Esperar respuesta del servidor.
-	memset(buffer, '\0', sizeof buffer);			// Limpiar el buffer
-	recv(clientSocket, buffer, 1024, 0);			// Recibir el mensaje.
-	printf("Mensaje: %s\n",buffer);					// Mostrar el mensaje.
-
 	
 	/*------------------------------ Revision de nombre ----------------------*/
 	// Abrimos el archivo 
@@ -241,10 +236,8 @@ int main(int argc, char* argv[]){
 	send(clientSocket, msj,strlen(msj),0);						// Enviar mensaje
 	printf("Esperando respuesta del servidor...\n");			// Mensaje al Usuario.
 	// Esperar respuesta del servidor 	
-	if (recv(clientSocket, buffer, 1024, 0)<0){	
-        perror("No se recibe respuesta");		
-        exit(EXIT_FAILURE);			
-	}
+	recv(clientSocket, buffer, 1024, 0);	
+	printf("Mensaje: %s\n",buffer);								// Mostrar el mensaje.
 	// Mostrar al usuario la respuesta del servidor.
 	if (buffer[1] == 'y'){
 		printf("Transaccion realizada con exito!\n");
