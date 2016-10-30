@@ -33,9 +33,17 @@ int get_index_of(int name, cajero C[]){
             return i;
         }
     }
-    return -1,
+    return -1;
 }
-
+int get_max_client(cajero C[]){
+    int i = 0,max = 0;
+    for (;i>MAXc;i++){
+        if(max < C[i].nombre ){
+            max = C[i].nombre;
+        }
+    }
+    return max;
+}
 void procesar_transaccion(char *buffer,cajero C[],int sckt_fd, char *depotfile, char * retirfile){
     char nombre[20],fecha[16]/*o 17*/,id[20],tipoc,
          *tipor = "Retiro",
@@ -72,6 +80,7 @@ void procesar_transaccion(char *buffer,cajero C[],int sckt_fd, char *depotfile, 
             //Escribimos en la bitacora
             fprintf(fd_diario,"%s por el usurio %s de monto %d el %s en el cajero %d\n",tipor,id,monto,fecha,C[i].nombre);
             fprintf(fd_retiro,"%s por el usurio %s de monto %d el %s en el cajero %d\n",tipor,id,monto,fecha,C[i].nombre);
+            fclose(fd_retiro);
             //Actualizamos total
             C[i].total -= monto;
         }else{ // NO HAY RIAL
@@ -95,7 +104,9 @@ void procesar_transaccion(char *buffer,cajero C[],int sckt_fd, char *depotfile, 
         fprintf(fd_diario,"%s por el usurio %s de monto %d el %s en el cajero %d\n",tipod,id,monto,fecha,C[i].nombre);
         fprintf(fd_deposito,"%s por el usurio %s de monto %d el %s en el cajero %d\n",tipod,id,monto,fecha,C[i].nombre);
         C[i].total += monto;
+        fclose(fd_deposito);
     }
+    fclose(fd_diario);
     //readline(fp,linea);
     //if(linea[0]!='\0'){
     //    sprintf(nombre,"%s",linea);
