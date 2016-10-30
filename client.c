@@ -214,7 +214,7 @@ int main(int argc, char* argv[]){
 	}
 	/*------------------------------ Revision de nombre ----------------------*/
 	// Abrimos el archivo 
-	fp = fopen("cajeroV.txt", "r");
+	fp = fopen("cajeroV.txt", "a+");
 	readline(fp,linea);
 	if(linea[0]!='\0'){
 		sprintf(nombre,"%s",linea);
@@ -227,20 +227,17 @@ int main(int argc, char* argv[]){
 	/*---------------------------------  Transaccion --------------------------*/
 	sprintf(msj,"%s|%s|%s|%c|%s|",nombre,fecha,id,tipo,monto);  // Creacion del mensaje
 	send(clientSocket, msj,strlen(msj),0);						// Enviar mensaje
-	printf("Esperando respuesta del servidor...\n");			// Mensaje al Usuario.
 	// Esperar respuesta del servidor 	
 	// Esperar respuesta del servidor.
-	memset(buffer, '\0', sizeof buffer);			// Limpiar el buffer
 	if (nombre[0]=='-'){
+		printf("Esperando Nombre...\n");				// Mensaje al Usuario.
 		memset(buffer, '\0', sizeof buffer);			// Limpiar el buffer
 		recv(clientSocket, buffer, 1024, 0);			// Recibir el mensaje.
 		writeLine("cajeroV.txt",buffer);
+		printf("Mi nombre es: %s\n", buffer );
 	}
+
 	memset(buffer, '\0', sizeof buffer);			// Limpiar el buffer
-	recv(clientSocket, buffer, 1024, 0);
-	//printf("Mi nombre es: %s\n", nombre );
-	// Esperar respuesta del servidor 	
-	memset(buffer, '\0', sizeof buffer);						// Limpieza del buffer
 	recv(clientSocket, buffer, 1024, 0);	
 	printf("Mensaje: %s\n",buffer);			
 

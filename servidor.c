@@ -63,7 +63,7 @@ void procesar_transaccion(char *buffer,cajero C[],int sckt_fd, char *depotfile, 
         exit(1);
     }
     if(nombre[0]=='-'){
-        printf("Enviando nombre\n");
+
         max = get_max_client(C);
         nombreint = max + 1;
         sprintf(buffer2,"%d",nombreint);
@@ -80,7 +80,7 @@ void procesar_transaccion(char *buffer,cajero C[],int sckt_fd, char *depotfile, 
             if (send(sckt_fd,"y",strlen("y"),0) != strlen("y")){
                 perror("Fallo en envio de confirmacion retiro.");
                 exit(1);
-            }
+            } 
             if((fd_retiro = fopen(retirfile, "a+") )== NULL){
                 perror("Error abriendo log deposito.");
                 exit(1);
@@ -101,6 +101,7 @@ void procesar_transaccion(char *buffer,cajero C[],int sckt_fd, char *depotfile, 
     }else if (tipoc == 'd'){//Deposito
         i = get_index_of(nombreint,C);
         C[i].nombre = nombreint;
+        printf("Nombre Recibido %s\n",nombreint);
         if (send(sckt_fd,"y",strlen("y"),0) != strlen("y")){
                 perror("Fallo en envio de confirmacion deposito.");
                 exit(1);
