@@ -12,17 +12,25 @@ Estructura y Archivos:
 	- client.c : Contiene todas las funciones necesarias para el funcionamiento
 				del cliente. En este sentido, contiene las siguientes funciones:
 
-		.- getTime:    Permite obtener la hora en la que se realiza la transacción.
+		.- getTime   : Permite obtener la hora en la que se realiza la transacción.
 		.- numRetiros: Permite ver cuántos retiros ha realizado alguien.
-		.- readLine:   Permite leer una linea de un archivo.
-		.- writeLine:  Permite escribir una linea en un archivo.
-		.- resolvDir:  Permite obtener la dirección IP del servidor remoto.
+		.- readLine  : Permite leer una linea de un archivo.
+		.- writeLine : Permite escribir una linea en un archivo.
+		.- resolvDir : Permite obtener la dirección IP del servidor remoto.
 		.- procesarArgumentos: Permite procesar los argumentos de la llamada.
 		.- main:       Ejecuta el algoritmo en el cual está implementado el
 					   protocolo de comunicación del cliente.
 
 	- servidor.c: 
-
+		.- inicializar : Inicializar un cajero nuevo
+		.- getIndexOf  : Obtener el indice del cajero
+		.- getMaxClient: Obtener el numero maximo que ha sido asignado
+		.- procesarTransaccion: Permite procesar las transacciones de cada cliente
+		.- procesarArgumentos : Permite procesar los argumentos de la llamada
+		.- struct Cajero: Estructura para guardar informacion de los cajeros.
+		.- main : Ejecuta el algoritmo en el cual está implementado el
+					   protocolo de comunicación del servidor.
+					   
 	- makefile : Permite compilar y enlazar los archivos necesarios para producir
 				 los ejecutables.
 
