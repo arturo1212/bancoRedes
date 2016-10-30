@@ -68,6 +68,7 @@ int resolvDir(char* dir, char* ret){
     struct addrinfo* res;
     int status;
     int error;
+    printf("OBTENIENDO DE: %s",dir);
     if ( (status = getaddrinfo(dir, NULL /*HACE FALTA PUERTO*/, NULL, &result)) != 0){
         fprintf(stderr, "Error getaddrinfo() : %s\n",gai_strerror(status) );
         exit(EXIT_FAILURE);
@@ -99,18 +100,15 @@ void writeLine(char * filename,char* id){
 void procesar_argumentos(char* srvr, char* port,char* op,char* monto, char* id,char* argv[]){
 	for(int i = 1;i<=9;i+=2){
 		if(argv[i][1]=='d'){
-			srvr = (char *)malloc(sizeof(argv[i+1]));
 			sprintf(srvr,"%s",argv[i+1]);
-
+			printf("PARSEANDO ANDO: %s\n",srvr);
 		}else if(argv[i][1]=='p'){
-			port = (char *)malloc(sizeof(argv[i+1]));
 			sprintf(port,"%s",argv[i+1]);
 
 		}else if (argv[i][1]=='c'){
 			*op = argv[i+1][1];
 
 		}else if (argv[i][1]=='m' && strlen(argv[i+1]) <= 5){
-			monto = (char *)malloc(sizeof(argv[i+1]));
 			sprintf(monto,"%s",argv[i+1]);
 
 		}else if (argv[i][1]=='i' && strlen(argv[i+1]) <= 20){
@@ -135,7 +133,7 @@ int main(int argc, char* argv[]){
 		id        : id del usuario
 		nombreReal: ip definitiva
 	*/
-	char *ipsrvrstr,*puertostr;
+	char ipsrvrstr[256],puertostr[256];
 	char tipo, monto[5],id[20], nombreReal[256],fecha[256];
 	char buffer[1024], msj[1024], linea[1024];	
 	char *nombre;
@@ -153,7 +151,7 @@ int main(int argc, char* argv[]){
 	FILE *fp, *retiros;
 
 	// ENTEROS
-	int clientSocket, total, puerto;	// Socket del cliente
+	int clientSocket, total, puerto,PORT;	// Socket del cliente
 
 	/*------------------------------ VERIFICACIONES ---------------------------*/
 	// Numero de argumentos
@@ -164,16 +162,19 @@ int main(int argc, char* argv[]){
 	}
 	// Obtener argumentos
 	procesar_argumentos(ipsrvrstr,puertostr,&tipo,monto,id,argv);
+	printf("IP SERVIDOR: %s y %s\n",ipsrvrstr,puertostr);
 	resolvDir(ipsrvrstr, nombreReal);
 	
 	// FECHA
 	getTime(fecha);
 
 	// RANGOS
-	if(tipo != 'r' && tipo != 'd'){
+	/*
+	if( strcmp(tipo, "r") && strcmp(tipo, "d")){
 		printf("Opcion Incorrecta.");
 		exit(0);			
 	}
+	*/
 	if(atoi(monto)> 3000 || atoi(monto)<=0){
 		printf("Monto incorrecto.");
 		exit(0);	
@@ -201,7 +202,7 @@ int main(int argc, char* argv[]){
 	setsockopt(clientSocket, SOL_SOCKET, SO_SNDTIMEO, &tv, sizeof(tv));
 	//  Colocar los datos del servidor
 	serverAddr.sin_family = AF_INET;
-	serverAddr.sin_port = htons(8888);								// Cambiar puerto tambien
+	serverAddr.sin_port = htons(atoi(puertostr));								// Cambiar puerto tambien
 	serverAddr.sin_addr.s_addr = INADDR_ANY;						// CAMBIAR AQUI
 	memset(serverAddr.sin_zero, '\0', sizeof serverAddr.sin_zero);
 
