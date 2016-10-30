@@ -169,6 +169,7 @@ int main(int argc, char* argv[]){
 	getTime(fecha);
 
 	// RANGOS
+
 	/*
 	if( strcmp(tipo, "r") && strcmp(tipo, "d")){
 		printf("Opcion Incorrecta.");
@@ -176,7 +177,7 @@ int main(int argc, char* argv[]){
 	}
 	*/
 	if(atoi(monto)> 3000 || atoi(monto)<=0){
-		printf("Monto incorrecto.");
+		printf("Monto Invalido.");
 		exit(0);	
 	}
 
@@ -236,7 +237,7 @@ int main(int argc, char* argv[]){
 
 	/*---------------------------------  Transaccion --------------------------*/
 	memset(buffer, '\0', sizeof buffer);						// Limpieza del buffer
-	sprintf(msj,"%s|%s|%s|%d|%s|",nombre,fecha,id,tipo,monto);  // Creacion del mensaje
+	sprintf(msj,"%s|%s|%s|%c|%s|",nombre,fecha,id,tipo,monto);  // Creacion del mensaje
 	send(clientSocket, msj,strlen(msj),0);						// Enviar mensaje
 	printf("Esperando respuesta del servidor...\n");			// Mensaje al Usuario.
 	// Esperar respuesta del servidor 	

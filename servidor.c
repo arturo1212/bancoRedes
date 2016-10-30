@@ -155,12 +155,10 @@ int main(int argc , char *argv[])
     struct sockaddr_in address;
 
     /*-------------------------- Argumentos ------------------------------*/
-
     if (argc != 7){
-        printf("Numero de argumentos incorrecto %d",argc);
-        exit(0);
+        fprintf(stderr, "Uso: bsb_srvr -l <puerto> -i <bitacora depositos> -c <bitacora retiro>\n");
+        exit(1);
     }
-
     procesarArgumentos(argv, port, depotfile, retirfile);
     PORT = atoi(port); 
     puts("Pase por aqui");
