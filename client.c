@@ -134,7 +134,7 @@ int main(int argc, char* argv[]){
 	char ipsrvrstr[256],puertostr[256];
 	char tipo, monto[5],id[20], nombreReal[256],fecha[256];
 	char buffer[1024], msj[1024], linea[1024];	
-	char *nombre;
+	char nombre[256];
 
 	// SOCKETS
 	struct sockaddr_in serverAddr;
@@ -214,16 +214,16 @@ int main(int argc, char* argv[]){
 	}
 	/*------------------------------ Revision de nombre ----------------------*/
 	// Abrimos el archivo 
-	fp = fopen("cajeroV.txt", "a+");
+	fp = fopen("cajeroV.txt", "r");
 	readline(fp,linea);
 	if(linea[0]!='\0'){
 		sprintf(nombre,"%s",linea);
 		//readline(fp,linea);
 	}
 	else{
-		nombre = "-";
+		sprintf(nombre,"-");
 	}
-
+	fclose(fp);
 	/*---------------------------------  Transaccion --------------------------*/
 	sprintf(msj,"%s|%s|%s|%c|%s|",nombre,fecha,id,tipo,monto);  // Creacion del mensaje
 	send(clientSocket, msj,strlen(msj),0);						// Enviar mensaje
@@ -231,21 +231,14 @@ int main(int argc, char* argv[]){
 	// Esperar respuesta del servidor 	
 	// Esperar respuesta del servidor.
 	memset(buffer, '\0', sizeof buffer);			// Limpiar el buffer
-	
 	if (nombre[0]=='-'){
-		if (recv(clientSocket, buffer, 1024, 0)<0){			// Recibir el mensaje.
-			perror("No se recibe respuesta");		
-        	exit(EXIT_FAILURE);
-    	}
-		sprintf(nombre,"%s",buffer);
-		writeLine("cajeroV.txt",nombre);
+		memset(buffer, '\0', sizeof buffer);			// Limpiar el buffer
+		recv(clientSocket, buffer, 1024, 0);			// Recibir el mensaje.
+		writeLine("cajeroV.txt",buffer);
 	}
-
-	if (recv(clientSocket, buffer, 1024, 0)<0){	
-        perror("No se recibe respuesta");		
-        exit(EXIT_FAILURE);			
-	}
-	printf("Mi nombre es: %s\n", nombre );
+	memset(buffer, '\0', sizeof buffer);			// Limpiar el buffer
+	recv(clientSocket, buffer, 1024, 0);
+	//printf("Mi nombre es: %s\n", nombre );
 	// Esperar respuesta del servidor 	
 	memset(buffer, '\0', sizeof buffer);						// Limpieza del buffer
 	recv(clientSocket, buffer, 1024, 0);	

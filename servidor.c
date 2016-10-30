@@ -63,6 +63,7 @@ void procesar_transaccion(char *buffer,cajero C[],int sckt_fd, char *depotfile, 
         exit(1);
     }
     if(nombre[0]=='-'){
+        printf("Enviando nombre\n");
         max = get_max_client(C);
         nombreint = max + 1;
         sprintf(buffer2,"%d",nombreint);
