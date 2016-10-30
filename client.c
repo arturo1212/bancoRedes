@@ -237,7 +237,8 @@ int main(int argc, char* argv[]){
 	if(nombre[0] == '-'){
 		memset(buffer, '\0', sizeof buffer);						// Limpieza del buffer
 		recv(clientSocket, buffer, 1024, 0);
-		sprintf(nombre,"%s",buffer);			
+		sprintf(nombre,"%s",buffer);
+		writeLine("cajeroV.txt",nombre);			
 	}
 	// Esperar respuesta del servidor 	
 	memset(buffer, '\0', sizeof buffer);						// Limpieza del buffer
