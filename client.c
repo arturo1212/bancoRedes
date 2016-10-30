@@ -225,7 +225,6 @@ int main(int argc, char* argv[]){
 	else{
 		nombre = "-";
 	}
-	printf("Mi nombre es: %s\n", nombre );
 
 	/*---------------------------------  Transaccion --------------------------*/
 	sprintf(msj,"%s|%s|%s|%c|%s|",nombre,fecha,id,tipo,monto);  // Creacion del mensaje
@@ -237,6 +236,7 @@ int main(int argc, char* argv[]){
 		sprintf(nombre,"%s",buffer);
 		writeLine("cajeroV.txt",nombre);			
 	}
+	printf("Mi nombre es: %s\n", nombre );
 	// Esperar respuesta del servidor 	
 	memset(buffer, '\0', sizeof buffer);						// Limpieza del buffer
 	recv(clientSocket, buffer, 1024, 0);	
