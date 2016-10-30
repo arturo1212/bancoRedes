@@ -243,9 +243,7 @@ int main(int argc, char* argv[]){
 	// Esperar respuesta del servidor 	
 	memset(buffer, '\0', sizeof buffer);						// Limpieza del buffer
 	recv(clientSocket, buffer, 1024, 0);	
-	printf("Mensaje: %s\n",buffer);		
-	printf("Mensaje: %s\n",buffer);								// Mostrar el mensaje.
-	
+	printf("Mensaje: %s\n",buffer);			
 
 	// Mostrar al usuario la respuesta del servidor.
 	if (buffer[1] == 'y'){
