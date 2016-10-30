@@ -51,9 +51,10 @@ int readline(FILE *f, char *buffer){
 int resolvDir(char* dir, char* ret){
     struct addrinfo* result;
     struct addrinfo* res;
+    int status;
     int error;
-    if (getaddrinfo(dir, NULL, NULL, &result) != 0){
-        perror("no pude resolver");
+    if ( (status = getaddrinfo(dir, NULL /*HACE FALTA PUERTO*/, NULL, &result)) != 0){
+        fprintf(stderr, "Error getaddrinfo() : %s\n",gai_strerror(status) );
         exit(EXIT_FAILURE);
         return -1;
     } 
