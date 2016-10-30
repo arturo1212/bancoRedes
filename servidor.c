@@ -120,7 +120,7 @@ void procesar_transaccion(char *buffer,cajero C[],int sckt_fd, char *depotfile, 
     BITACORA retirfile
  */
 void procesarArgumentos(char* argv[],char *port, char *depotfile, char *retirfile){
-    for(int i = 1;i<=7;i+=2){
+    for(int i = 1;i<=5;i+=2){
         if(argv[i][1]=='l'){
             sprintf(port,"%s",argv[i+1]);
         }
@@ -157,6 +157,10 @@ int main(int argc , char *argv[])
     struct sockaddr_in address;
 
     /*-------------------------- Argumentos ------------------------------*/
+    if (argc != 7){
+        fprintf(stderr, "Uso: bsb_srvr -l <puerto> -i <bitacora depositos> -c <bitacora retiro>\n");
+        exit(1);
+    }
     procesarArgumentos(argv, port, depotfile, retirfile);
     PORT = atoi(port); 
 
