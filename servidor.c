@@ -51,6 +51,7 @@ void procesar_transaccion(char *buffer,cajero C[],int sckt_fd, char *depotfile, 
     char nombre[20],fecha[16]/*o 17*/,id[20],tipoc,
          *tipor = "Retiro",
          *tipod = "Deposito";
+    char buffer2[1024];
     int i,max, nombreint,monto;
     FILE *fd_diario,*fd_deposito,*fd_retiro;
     sscanf(buffer,"%s|%s|%s|%c|%d|",nombre,fecha,id,&tipoc,&monto);
@@ -63,6 +64,8 @@ void procesar_transaccion(char *buffer,cajero C[],int sckt_fd, char *depotfile, 
     if(nombre[0]=='-'){
         max = get_max_client(C);
         nombreint = max + 1;
+        sprintf(buffer2,"%d",nombreint);
+        send(sckt_fd,buffer2,strlen(buffer2),0);
 
     }else{
         sscanf(nombre,"%d",&nombreint);
