@@ -13,7 +13,9 @@
 #include <netdb.h>
 
 #define MAX_NOMBR 256
-
+#ifndef   NI_MAXHOST
+#define   NI_MAXHOST 1025
+#endif
 void getTime(char *buffer){
 time_t timer;
     struct tm* tm_info;
