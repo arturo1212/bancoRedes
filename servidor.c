@@ -54,9 +54,13 @@ void procesar_transaccion(char *buffer,cajero C[],int sckt_fd, char *depotfile, 
     char buffer2[20];
     int i,max, nombreint,monto;
     FILE *fd_diario,*fd_deposito,*fd_retiro;
-    sscanf(buffer,"%s | %s | %s | %s | %d",&nombre,&fecha,&id,&tipoc,&monto);
+    sscanf(buffer,"%s | %s | %s | %s | %d",nombre,&fecha,&id,&tipoc,&monto);
     printf("Estoy procesando una peticion\n");
     puts(buffer);
+    puts(nombre);
+    puts(fecha);
+    puts(id);
+    printf("%d\n",monto);
     //RECORDAR QUE LOS ARCHIVOS DE AQUI SON PARAMENTROS DE LLAMADA
     //A EXCEPCION DEL DEIARIO
     if((fd_diario = fopen("logDiario.txt", "a+") )== NULL){//Ver Cambiar nombre por dia
@@ -103,7 +107,7 @@ void procesar_transaccion(char *buffer,cajero C[],int sckt_fd, char *depotfile, 
             //Negado y mandamos rial (?)
         }
     }else if (tipoc[0] == 'd'){//Deposito
-        puts("Efectuando Deposito")
+        puts("Efectuando Deposito");
         i = get_index_of(nombreint,C);
         C[i].nombre = nombreint;
         printf("Nombre Recibido %s\n",nombreint);
@@ -251,10 +255,7 @@ int main(int argc , char *argv[])
             printf("Nueva conexion , IP: %s , PUERTO: %d \n",
                     inet_ntoa(address.sin_addr) , 
                     ntohs(address.sin_port));
-        
-            // Enviar mensaje de confirmacion.
-            printf("Vamo a procesar \n");
-            //procesar_transaccion(buffer,clientes,sd,depotfile,retirfile);
+
             // Agregar el socket a la lista.
             for (i = 0; i < MAXc; i++){
                 if( clientS[i] == 0 ){
