@@ -100,10 +100,8 @@ void procesar_argumentos(char* srvr, char* port,char* op,char* monto, char* id,c
 	for(int i = 1;i<=9;i+=2){
 		printf("%d %s\n", i, argv[i]);
 		if(argv[i][1]=='d'){
-			printf("Entre en el if\n");
 			srvr = (char *)malloc(sizeof(argv[i+1]));
 			sprintf(srvr,"%s",argv[i+1]);
-			printf("%s\n", srvr);
 
 		}else if(argv[i][1]=='p'){
 			port = (char *)malloc(sizeof(argv[i+1]));
@@ -112,12 +110,11 @@ void procesar_argumentos(char* srvr, char* port,char* op,char* monto, char* id,c
 		}else if (argv[i][1]=='c'){
 			*op = argv[i+1][1];
 
-		}else if (argv[i][1]=='m'){
+		}else if (argv[i][1]=='m' && strlen(argv[i+1]) <= 5){
 			monto = (char *)malloc(sizeof(argv[i+1]));
 			sprintf(monto,"%s",argv[i+1]);
 
-		}else if (argv[i][1]=='i'){
-			
+		}else if (argv[i][1]=='i' && strlen(argv[i+1]) <= 20){
 			sprintf(id,"%s",argv[i+1]);
 
 		}else{
@@ -160,16 +157,28 @@ int main(int argc, char* argv[]){
 	int clientSocket, total, puerto;	// Socket del cliente
 
 	/*------------------------------ VERIFICACIONES ---------------------------*/
-	// Numero correcto de argumentos
+	// Numero de argumentos
 	if (argc != 11){
 		fprintf(stderr, "Uso: bsb_cli -d <ip servidor> -p <puerto> -c <operacion> \
 							 -m <monto> -i <identificador>\n" );
 		exit(1);
 	}
-	// Obtener los argumentos del terminal, la ip del servidor y la fecha
+	// Obtener argumentos
 	procesar_argumentos(ipsrvrstr,puertostr,&tipo,monto,id,argv);
 	resolvDir(ipsrvrstr, nombreReal);
+	
+	// FECHA
 	getTime(fecha);
+
+	// RANGOS
+	if(tipo != 'r' && tipo != 'd'){
+		printf("Opcion Incorrecta.");
+		exit(0);			
+	}
+	if(atoi(monto)> 3000 || atoi(monto)<=0){
+		printf("Monto incorrecto.");
+		exit(0);	
+	}
 
 	// Ver, si es un retiro, si es el cuarto.
 	if(numRetiros("retiros.txt",id) >= 3 && tipo == 'r'){
@@ -238,7 +247,8 @@ int main(int argc, char* argv[]){
 	// Mostrar al usuario la respuesta del servidor.
 	if (buffer[1] == 'y'){
 		printf("Transaccion realizada con exito!\n");
-		//mostrar mensaje con cosas que hacen falta.
+		printf("Fecha: %s\n Operacion: %s\n ID: %s\n Monto: %s\n",
+				 fecha, tipo, id, monto );
 	}	
 	else{
 		printf("No hay dinero disponible actualmente.");
