@@ -48,14 +48,14 @@ int get_max_client(cajero C[]){
 }
 
 void procesar_transaccion(char *buffer,cajero C[],int sckt_fd, char *depotfile, char * retirfile){
-    char nombre[20],fecha[16]/*o 17*/,id[20],tipoc,
+    char nombre[20],fecha[16]/*o 17*/,id[20],tipoc[20],
          *tipor = "Retiro",
          *tipod = "Deposito";
     char buffer2[1024];
     int i,max, nombreint,monto;
     FILE *fd_diario,*fd_deposito,*fd_retiro;
-    sscanf(buffer,"%s|%s|%s|%c|%d|",nombre,fecha,id,&tipoc,&monto);
-    printf("Estoy procesando una peticion\n");
+    sscanf(buffer,"%s|%s|%s|%s|%d|",nombre,fecha,id,tipoc,&monto);
+    printf("Estoy procesando una peticion %s %s %c\n",nombre,fecha,tipoc);
     //RECORDAR QUE LOS ARCHIVOS DE AQUI SON PARAMENTROS DE LLAMADA
     //A EXCEPCION DEL DEIARIO
     if((fd_diario = fopen("logDiario.txt", "a+") )== NULL){//Ver Cambiar nombre por dia
@@ -72,7 +72,7 @@ void procesar_transaccion(char *buffer,cajero C[],int sckt_fd, char *depotfile, 
     }else{
         sscanf(nombre,"%d",&nombreint);
     }
-    if (tipoc == 'r'){ //Retiros
+    if (tipoc[0] == 'r'){ //Retiros
         i = get_index_of(nombreint,C);
         C[i].nombre = nombreint;
         if(C[i].total > 5000){
@@ -98,7 +98,7 @@ void procesar_transaccion(char *buffer,cajero C[],int sckt_fd, char *depotfile, 
             }
             //Negado y mandamos rial (?)
         }
-    }else if (tipoc == 'd'){//Deposito
+    }else if (tipoc[0] == 'd'){//Deposito
         i = get_index_of(nombreint,C);
         C[i].nombre = nombreint;
         printf("Nombre Recibido %s\n",nombreint);
@@ -115,6 +115,7 @@ void procesar_transaccion(char *buffer,cajero C[],int sckt_fd, char *depotfile, 
         C[i].total += monto;
         fclose(fd_deposito);
     }
+    else
     fclose(fd_diario);
     //readline(fp,linea);
     //if(linea[0]!='\0'){
@@ -247,7 +248,7 @@ int main(int argc , char *argv[])
                     ntohs(address.sin_port));
         
             // Enviar mensaje de confirmacion.
-            printf("Vamo a procesar");
+            printf("Vamo a procesar ");
             procesar_transaccion(buffer,clientes,sd,depotfile,retirfile);
             // Agregar el socket a la lista.
             for (i = 0; i < MAXc; i++){

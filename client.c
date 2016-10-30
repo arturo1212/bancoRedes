@@ -104,7 +104,7 @@ void procesar_argumentos(char* srvr, char* port,char* op,char* monto, char* id,c
 			sprintf(port,"%s",argv[i+1]);
 
 		}else if (argv[i][1]=='c'){
-			*op = argv[i+1][1];
+			sprintf(op,"%s",argv[i+1]);
 
 		}else if (argv[i][1]=='m' && strlen(argv[i+1]) <= 5){
 			sprintf(monto,"%s",argv[i+1]);
@@ -132,7 +132,7 @@ int main(int argc, char* argv[]){
 		nombreReal: ip definitiva
 	*/
 	char ipsrvrstr[256],puertostr[256];
-	char tipo, monto[5],id[20], nombreReal[256],fecha[256];
+	char tipo[5], monto[5],id[20], nombreReal[256],fecha[256];
 	char buffer[1024], msj[1024], linea[1024];	
 	char nombre[256];
 
@@ -159,14 +159,14 @@ int main(int argc, char* argv[]){
 		exit(1);
 	}
 	// Obtener argumentos
-	procesar_argumentos(ipsrvrstr,puertostr,&tipo,monto,id,argv);
+	procesar_argumentos(ipsrvrstr,puertostr,tipo,monto,id,argv);
 	resolvDir(ipsrvrstr, nombreReal);
 	
 	// FECHA
 	getTime(fecha);
 
 	// RANGOS
-
+	printf("TIPO: %s\n", tipo);
 	/*
 	if( strcmp(tipo, "r") && strcmp(tipo, "d")){
 		printf("Opcion Incorrecta.");
@@ -179,7 +179,7 @@ int main(int argc, char* argv[]){
 	}
 
 	// Ver, si es un retiro, si es el cuarto.
-	if(numRetiros("retiros.txt",id) >= 3 && tipo == 'r'){
+	if(numRetiros("retiros.txt",id) >= 3 && tipo[0] == 'r'){
 		printf("No puede realizar mas retiros por hoy.");
 		exit(0);	
 	}
@@ -214,7 +214,7 @@ int main(int argc, char* argv[]){
 	}
 	/*------------------------------ Revision de nombre ----------------------*/
 	// Abrimos el archivo 
-	fp = fopen("cajeroV.txt", "a+");
+	fp = fopen("cajeroV.txt", "r");
 	readline(fp,linea);
 	if(linea[0]!='\0'){
 		sprintf(nombre,"%s",linea);
@@ -225,7 +225,8 @@ int main(int argc, char* argv[]){
 	}
 	fclose(fp);
 	/*---------------------------------  Transaccion --------------------------*/
-	sprintf(msj,"%s|%s|%s|%c|%s|",nombre,fecha,id,tipo,monto);  // Creacion del mensaje
+	sprintf(msj,"%s|%s|%s|%s|%s|",nombre,fecha,id,tipo,monto);  // Creacion del mensaje
+		printf("MENSAJEEE %s\n",msj);
 	send(clientSocket, msj,strlen(msj),0);						// Enviar mensaje
 	// Esperar respuesta del servidor 	
 	// Esperar respuesta del servidor.
