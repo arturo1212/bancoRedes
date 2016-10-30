@@ -17,15 +17,14 @@
 #define MAXc 10
 
 typedef struct Cajeros{
-    int monto,sock_fd;
-    char nombre[20];
+    int total,nombre;
 }cajero;
 
 void inicializar (cajero C[]){
     int i = 0;
     for (;i<MAXc;i++){
-        C[i].monto = 80000;
-        sprintf(C[i].nombre,"-");
+        C[i].total = 80000;
+        C[i].nombre = 0;        
     }
 }
 
@@ -33,9 +32,67 @@ void procesar_transaccion(char *buffer,cajero C[],int sckt_fd){
     char nombre[20],fecha[16]/*o 17*/,id[20],tipoc,
          *tipor = "Retiro",
          *tipod = "Deposito";
-    int monto;
+    int i,max, nombreint,monto;
+    FILE *fd_diario,*fd_deposito,*fd_retiro;
     sscanf(buffer,"%s|%s|%s|%c|%d|",nombre,fecha,id,&tipoc,&monto);
+    //RECORDAR QUE LOS ARCHIVOS DE AQUI SON PARAMENTROS DE LLAMADA
+    //A EXCEPCION DEL DEIARIO
+    if((fd_diario = fopen("logDiario.txt", "w+") )== NULL){//Ver Cambiar nombre por dia
+        perror("Error abriendo log diario.");
+        exit(1);
+    }
+    if(nombre[0]=='-'){
+        max = get_max_client(C);
+        nombreint = max + 1;
 
+    }else{
+        sscanf(nombre,"%d",&nombreint);
+    }
+    if (tipoc == 'r'){ //Retiros
+        i = get_index_of(nombreint,C);
+        C[i].nombre = nombreint;
+        if(C[i].total > 5000){
+            //Enviamos mensaje de confirmacion
+            if (send(sckt_fd,"y",strlen("y"),0) != strlen("y")){
+                perror("Fallo en envio de confirmacion retiro.");
+                exit(1);
+            }
+            if((fd_retiro = fopen("Retiro.txt", "a+") )== NULL){
+                perror("Error abriendo log deposito.");
+                exit(1);
+            }
+            //Escribimos en la bitacora
+            fprintf(fd_diario,"%s por el usurio %s de monto %d el %s en el cajero %d\n",tipor,id,monto,fecha,C[i].nombre);
+            fprintf(fd_retiro,"%s por el usurio %s de monto %d el %s en el cajero %d\n",tipor,id,monto,fecha,C[i].nombre);
+            //Actualizamos total
+            C[i].total -= monto;
+        }else{ // NO HAY RIAL
+            if (send(sckt_fd,"n",strlen("y"),0) != strlen("n")){
+                perror("Fallo en envio de negacion retiro.");
+                exit(1);
+            }
+            //Negado y mandamos rial (?)
+        }
+    }else if (tipoc == 'd'){//Deposito
+        i = get_index_of(nombreint,C);
+        C[i].nombre = nombreint;
+        if (send(sckt_fd,"y",strlen("y"),0) != strlen("y")){
+                perror("Fallo en envio de confirmacion deposito.");
+                exit(1);
+            }
+        if((fd_deposito = fopen("Deposito.txt", "w+") )== NULL){
+            perror("Error abriendo log deposito.");
+            exit(1);
+        }
+        fprintf(fd_diario,"%s por el usurio %s de monto %d el %s en el cajero %d\n",tipod,id,monto,fecha,C[i].nombre);
+        fprintf(fd_deposito,"%s por el usurio %s de monto %d el %s en el cajero %d\n",tipod,id,monto,fecha,C[i].nombre);
+        C[i].total += monto;
+    }
+    //readline(fp,linea);
+    //if(linea[0]!='\0'){
+    //    sprintf(nombre,"%s",linea);
+        //readline(fp,linea);
+    //}
 }
 // LECTURA DE PARAMETROS
  /*
