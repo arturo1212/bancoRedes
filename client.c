@@ -69,21 +69,28 @@ int resolvDir(char* dir, char* ret){
 }
 
 
-void procesar_argumentos(char* srvr, char* port,char* op,char* monto, char* id,char* argv[],int argc){
-	for(int i = 1;i<argc;i+=2){
+void procesar_argumentos(char* srvr, char* port,char* op,char* monto, char* id,char* argv[]){
+	for(int i = 1;i<=9;i+=2){
+		printf("%d %s\n", i, argv[i]);
 		if(argv[i][1]=='d'){
+			printf("Entre en el if\n");
+			srvr = (char *)malloc(sizeof(argv[i+1]));
 			sprintf(srvr,"%s",argv[i+1]);
+			printf("%s\n", srvr);
 
 		}else if(argv[i][1]=='p'){
+			port = (char *)malloc(sizeof(argv[i+1]));
 			sprintf(port,"%s",argv[i+1]);
 
 		}else if (argv[i][1]=='c'){
 			*op = argv[i+1][1];
 
 		}else if (argv[i][1]=='m'){
+			monto = (char *)malloc(sizeof(argv[i+1]));
 			sprintf(monto,"%s",argv[i+1]);
 
 		}else if (argv[i][1]=='i'){
+			
 			sprintf(id,"%s",argv[i+1]);
 
 		}else{
@@ -133,7 +140,7 @@ int main(int argc, char* argv[]){
 		exit(1);
 	}
 	// Obtener los argumentos del terminal, la ip del servidor y la fecha
-	procesar_argumentos(ipsrvrstr,puertostr,&tipo,monto,id,argv,argc);
+	procesar_argumentos(ipsrvrstr,puertostr,&tipo,monto,id,argv);
 	resolvDir(ipsrvrstr, nombreReal);
 	getTime(fecha);
 
@@ -175,11 +182,12 @@ int main(int argc, char* argv[]){
 	readline(fp,linea);
 	if(linea[0]!='\0'){
 		sprintf(nombre,"%s",linea);
-		readline(fp,linea);
+		//readline(fp,linea);
 	}
 	else{
 		nombre = "-";
 	}
+	printf("Mi nombre es: %s\n", nombre );
 
 	/*---------------------------------  Transaccion --------------------------*/
 	memset(buffer, '\0', sizeof buffer);						// Limpieza del buffer
@@ -193,11 +201,11 @@ int main(int argc, char* argv[]){
 	}
 	// Mostrar al usuario la respuesta del servidor.
 	if (buffer[1] == 'y'){
-		printf("Transaccion realizada con exito!\n")
+		printf("Transaccion realizada con exito!\n");
 		//mostrar mensaje con cosas que hacen falta.
 	}	
 	else{
-		printf("No hay dinero disponible actualmente.")
+		printf("No hay dinero disponible actualmente.");
 	}
 
   return 0;
