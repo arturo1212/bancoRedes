@@ -68,7 +68,6 @@ int resolvDir(char* dir, char* ret){
     struct addrinfo* res;
     int status;
     int error;
-    printf("OBTENIENDO DE: %s",dir);
     if ( (status = getaddrinfo(dir, NULL /*HACE FALTA PUERTO*/, NULL, &result)) != 0){
         fprintf(stderr, "Error getaddrinfo() : %s\n",gai_strerror(status) );
         exit(EXIT_FAILURE);
@@ -101,7 +100,6 @@ void procesar_argumentos(char* srvr, char* port,char* op,char* monto, char* id,c
 	for(int i = 1;i<=9;i+=2){
 		if(argv[i][1]=='d'){
 			sprintf(srvr,"%s",argv[i+1]);
-			printf("PARSEANDO ANDO: %s\n",srvr);
 		}else if(argv[i][1]=='p'){
 			sprintf(port,"%s",argv[i+1]);
 
@@ -162,7 +160,6 @@ int main(int argc, char* argv[]){
 	}
 	// Obtener argumentos
 	procesar_argumentos(ipsrvrstr,puertostr,&tipo,monto,id,argv);
-	printf("IP SERVIDOR: %s y %s\n",ipsrvrstr,puertostr);
 	resolvDir(ipsrvrstr, nombreReal);
 	
 	// FECHA
@@ -215,10 +212,9 @@ int main(int argc, char* argv[]){
         perror("Error conectando al servidor");
         exit(EXIT_FAILURE);			
 	}
-	
 	/*------------------------------ Revision de nombre ----------------------*/
 	// Abrimos el archivo 
-	fp = fopen("cajeroV.txt", "w+");
+	fp = fopen("cajeroV.txt", "a+");
 	readline(fp,linea);
 	if(linea[0]!='\0'){
 		sprintf(nombre,"%s",linea);
@@ -229,7 +225,6 @@ int main(int argc, char* argv[]){
 	}
 
 	/*---------------------------------  Transaccion --------------------------*/
-	memset(buffer, '\0', sizeof buffer);						// Limpieza del buffer
 	sprintf(msj,"%s|%s|%s|%c|%s|",nombre,fecha,id,tipo,monto);  // Creacion del mensaje
 	send(clientSocket, msj,strlen(msj),0);						// Enviar mensaje
 	printf("Esperando respuesta del servidor...\n");			// Mensaje al Usuario.
@@ -243,13 +238,19 @@ int main(int argc, char* argv[]){
         	exit(EXIT_FAILURE);
     	}
 		sprintf(nombre,"%s",buffer);
-		printf("Mi nombre es: %s\n", nombre );					// Mostrar el mensaje.
+		writeLine("cajeroV.txt",nombre);
 	}
 
 	if (recv(clientSocket, buffer, 1024, 0)<0){	
         perror("No se recibe respuesta");		
         exit(EXIT_FAILURE);			
 	}
+	printf("Mi nombre es: %s\n", nombre );
+	// Esperar respuesta del servidor 	
+	memset(buffer, '\0', sizeof buffer);						// Limpieza del buffer
+	recv(clientSocket, buffer, 1024, 0);	
+	printf("Mensaje: %s\n",buffer);			
+
 	// Mostrar al usuario la respuesta del servidor.
 	if (buffer[1] == 'y'){
 		printf("Transaccion realizada con exito!\n");
