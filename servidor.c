@@ -37,7 +37,12 @@ void procesar_transaccion(char *buffer,cajero C[],int sckt_fd){
     sscanf(buffer,"%s|%s|%s|%c|%d|",nombre,fecha,id,&tipoc,&monto);
 
 }
-
+// LECTURA DE PARAMETROS
+ /*
+    PUERTO
+    BITACORA ENTRADA
+    BITACORA SALIDA
+ */
 int main(int argc , char *argv[])
 {
     /*---------------------- Declaracion de Variables -------------------*/
@@ -50,7 +55,6 @@ int main(int argc , char *argv[])
     int clientS[MAXc];
     int max_sd, activity, i , valread , sd;
 
-
     // STRINGS Y CARACTERES 
     char buffer[1025];
     char *msj = "Conexion Satisfactoria. \n";
@@ -61,13 +65,12 @@ int main(int argc , char *argv[])
     // SOCKETS
     struct sockaddr_in address;   
 
-  
-    for (i = 0; i < MAXc; i++) 
-    {
+    /*----------------------- Acondicionar el entorno --------------------*/
+    for (i = 0; i < MAXc; i++){
         clientS[i] = 0;
     }
       
-    // Creacion de socket maestro
+    // SOCKET:Creacion de socket maestro
     if( (masterS = socket(AF_INET , SOCK_STREAM , 0)) == 0) {
         perror("Error en socket.");
         exit(EXIT_FAILURE);
@@ -77,9 +80,9 @@ int main(int argc , char *argv[])
         perror("Error en config del socket.");
         exit(EXIT_FAILURE);
     }
-    address.sin_family = AF_INET;
-    address.sin_addr.s_addr = INADDR_ANY;
-    address.sin_port = htons(PORT);       
+    address.sin_family = AF_INET;           // Familia
+    address.sin_addr.s_addr = INADDR_ANY;   // Todas mis interfaces.
+    address.sin_port = htons(PORT);         // Puerto especificado.
       
     // BIND: Asociamos el socket a la direccion especificada. 
     if (bind(masterS, (struct sockaddr *)&address, sizeof(address)) < 0) {
@@ -93,34 +96,23 @@ int main(int argc , char *argv[])
         perror("Error en listen.");
         exit(EXIT_FAILURE);
     }
-       
+
     // Guardar el largo de la direccion para otras funciones.
     addrlen = sizeof(address);
     puts("Esperando conexiones");
     
-    // Algoritmo principal.
+    /*----------------------------- Monitorear --------------------------*/
     while(1){
-       /*
-         Limpiamos el conjunto de sockets
-         Agregamos el socket del master al conjunto
-         Actualizamos el descriptor mas grande.
-        */
-        FD_ZERO(&readfds);
-        FD_SET(masterS, &readfds);
-        max_sd = masterS;
-         
-        /*
-         Agregamos los sockets de los clientes.
-            (Solo agregamos los sockets activos)
-         Tambien actualizamos el descriptor mas grande.
-        */
-        for ( i = 0 ; i < MAXc ; i++){
-            sd = clientS[i];
-            if(sd > 0)
-                FD_SET( sd , &readfds);
-            if(sd > max_sd)
-                max_sd = sd;
+        FD_ZERO(&readfds);          // Limpiar el conjunto de sockets
+        FD_SET(masterS, &readfds);  // Agregar socket maestro
+        max_sd = masterS;           // Actualizar descriptor mas grande
+
+        for ( i = 0 ; i < MAXc ; i++){          
+            sd = clientS[i];                    // Tomar descriptor del socket
+            if(sd > 0){FD_SET( sd , &readfds);} // Agregar sockets activos (Clientes)
+            if(sd > max_sd){max_sd = sd;}       // Actualizar max fd
         }
+        
         /*
             Despues de tener todos los sockets agregados,
             los monitoreamos hasta detectar actividad en
