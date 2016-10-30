@@ -17,18 +17,31 @@
 #define MAXc 10
 
 typedef struct Cajeros{
+    int monto,sock_fd;
+    char nombre[20];
+}cajero;
 
+void inicializar (cajero C[]){
+    int i = 0;
+    for (;i<MAXc;i++){
+        C[i].monto = 80000;
+        sprintf(C[i].nombre,"-");
+    }
 }
+
 int main(int argc , char *argv[])
 {
     /*---------------------- Declaracion de Variables -------------------*/
+    //ARREGLO DE CLIENTES
+    cajero clientes[MAXc];
+
     // ENTEROS
     int opt = 1;
     int masterS , addrlen , new_socket;
     int clientS[MAXc];
     int max_sd, activity, i , valread , sd;
 
-    
+
     // STRINGS Y CARACTERES 
     char buffer[1025];
     char *msj = "Conexion Satisfactoria. \n";
@@ -108,7 +121,7 @@ int main(int argc , char *argv[])
             de manera indefinida, es decir, es bloqueante.
         */  
         activity = select( max_sd + 1 , &readfds,
-                             NULL , NULL , NUL L);
+                             NULL , NULL , NULL);
         if ((activity < 0) && (errno!=EINTR)){
             printf("Error en select.");
         }
