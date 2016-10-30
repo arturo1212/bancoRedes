@@ -22,7 +22,7 @@ void getTime(char *buffer){
     struct tm* tm_info;
     time(&timer);
     tm_info = localtime(&timer);
-    strftime(buffer, 26, "%Y/%m/%d %H:%M", tm_info);
+    strftime(buffer, 26, "%Y/%m/%d-%H:%M", tm_info);
 }
 
 int numRetiros(char * filename,char* id){
@@ -104,7 +104,7 @@ void procesar_argumentos(char* srvr, char* port,char* op,char* monto, char* id,c
 			sprintf(port,"%s",argv[i+1]);
 
 		}else if (argv[i][1]=='c'){
-			*op = argv[i+1][1];
+			sprintf(op,"%s",argv[i+1]);
 
 		}else if (argv[i][1]=='m' && strlen(argv[i+1]) <= 5){
 			sprintf(monto,"%s",argv[i+1]);
@@ -132,10 +132,9 @@ int main(int argc, char* argv[]){
 		nombreReal: ip definitiva
 	*/
 	char ipsrvrstr[256],puertostr[256];
-	char tipo, monto[5],id[20], nombreReal[256],fecha[256];
+	char tipo[5], monto[5],id[20], nombreReal[256],fecha[256];
 	char buffer[1024], msj[1024], linea[1024];	
 	char nombre[20];
-
 	// SOCKETS
 	struct sockaddr_in serverAddr;
 	struct timeval tv;
@@ -159,14 +158,14 @@ int main(int argc, char* argv[]){
 		exit(1);
 	}
 	// Obtener argumentos
-	procesar_argumentos(ipsrvrstr,puertostr,&tipo,monto,id,argv);
+	procesar_argumentos(ipsrvrstr,puertostr,tipo,monto,id,argv);
 	resolvDir(ipsrvrstr, nombreReal);
 	
 	// FECHA
 	getTime(fecha);
 
 	// RANGOS
-
+	printf("TIPO: %s\n", tipo);
 	/*
 	if( strcmp(tipo, "r") && strcmp(tipo, "d")){
 		printf("Opcion Incorrecta.");
@@ -179,12 +178,12 @@ int main(int argc, char* argv[]){
 	}
 
 	// Ver, si es un retiro, si es el cuarto.
-	if(numRetiros("retiros.txt",id) >= 3 && tipo == 'r'){
+	if(numRetiros("retiros.txt",id) >= 3 && tipo[0] == 'r'){
 		printf("No puede realizar mas retiros por hoy.");
 		exit(0);	
 	}
 	// Si es un retiro, agregarlo a la lista.
-	if(tipo == 'r'){
+	if(tipo[0] == 'r'){
 		writeLine("retiros.txt",id);
 	}
 
@@ -214,26 +213,23 @@ int main(int argc, char* argv[]){
 	}
 	/*------------------------------ Revision de nombre ----------------------*/
 	// Abrimos el archivo 
-	fp = fopen("cajeroV.txt", "a+");
+	fp = fopen("cajeroV.txt", "r");
 	readline(fp,linea);
 	if(linea[0]!='\0'){
 		sprintf(nombre,"%s",linea);
 		//readline(fp,linea);
 	}
 	else{
-		memset(nombre,0,sizeof nombre);
-		nombre[0] = '-';
+		sprintf(nombre,"-");
 	}
-	printf("%c\n",tipo);
+	fclose(fp);
 	/*---------------------------------  Transaccion --------------------------*/
-	sprintf(msj,"%s|%s|%s|%s|%s|",nombre,fecha,id,tipo,monto);  // Creacion del mensaje
+	sprintf(msj,"%s | %s | %s | %s | %s",nombre,fecha,id,tipo,monto);  // Creacion del mensaje
 	send(clientSocket, msj,strlen(msj),0);						// Enviar mensaje
-	printf("Esperando respuesta del servidor...\n");			// Mensaje al Usuario.
 	// Esperar respuesta del servidor 	
 	// Esperar respuesta del servidor.
-	memset(buffer, '\0', sizeof buffer);			// Limpiar el buffer
-	
 	if (nombre[0]=='-'){
+		memset(buffer, '\0', sizeof buffer);			// Limpiar el buffer
 		puts("No tengo nombre");
 		if (recv(clientSocket, buffer, 1024, 0)<0){			// Recibir el mensaje.
 			perror("No se recibe respuesta");		
@@ -244,13 +240,12 @@ int main(int argc, char* argv[]){
 		writeLine("cajeroV.txt",nombre);
 	}
 	printf("Mi nombre es: %s\n", nombre );
+	
+	//Esperar respuesta del servidor
 	if (recv(clientSocket, buffer, 1024, 0)<0){	
         perror("No se recibe respuesta");		
         exit(EXIT_FAILURE);			
 	}
-	// Esperar respuesta del servidor 	
-	memset(buffer, '\0', sizeof buffer);						// Limpieza del buffer
-	recv(clientSocket, buffer, 1024, 0);	
 	printf("Mensaje: %s\n",buffer);			
 
 	// Mostrar al usuario la respuesta del servidor.

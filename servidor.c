@@ -48,13 +48,13 @@ int get_max_client(cajero C[]){
 }
 
 void procesar_transaccion(char *buffer,cajero C[],int sckt_fd, char *depotfile, char * retirfile){
-    char nombre[20],fecha[16]/*o 17*/,id[20],tipoc,
+    char nombre[20],fecha[16]/*o 17*/,id[20],tipoc[20],
          *tipor = "Retiro",
          *tipod = "Deposito";
     char buffer2[20];
     int i,max, nombreint,monto;
     FILE *fd_diario,*fd_deposito,*fd_retiro;
-    sscanf(buffer,"%s|%s|%s|%c|%d|",nombre,fecha,id,&tipoc,&monto);
+    sscanf(buffer,"%s | %s | %s | %s | %d",&nombre,&fecha,&id,&tipoc,&monto);
     printf("Estoy procesando una peticion\n");
     puts(buffer);
     //RECORDAR QUE LOS ARCHIVOS DE AQUI SON PARAMENTROS DE LLAMADA
@@ -74,8 +74,8 @@ void procesar_transaccion(char *buffer,cajero C[],int sckt_fd, char *depotfile, 
     }else{
         sscanf(nombre,"%d",&nombreint);
     }
-    printf("Tipo de trans: %c\n",tipoc);;
-    if (tipoc == 'r'){ //Retiros
+    printf("Tipo de trans: %s\n",tipoc);
+    if (tipoc[0] == 'r'){ //Retiros
         puts("Efectuando retiro");
         i = get_index_of(nombreint,C);
         C[i].nombre = nombreint;
@@ -84,7 +84,7 @@ void procesar_transaccion(char *buffer,cajero C[],int sckt_fd, char *depotfile, 
             if (send(sckt_fd,"y",strlen("y"),0) != strlen("y")){
                 perror("Fallo en envio de confirmacion retiro.");
                 exit(1);
-            }
+            } 
             if((fd_retiro = fopen(retirfile, "a+") )== NULL){
                 perror("Error abriendo log deposito.");
                 exit(1);
@@ -102,9 +102,11 @@ void procesar_transaccion(char *buffer,cajero C[],int sckt_fd, char *depotfile, 
             }
             //Negado y mandamos rial (?)
         }
-    }else if (tipoc == 'd'){//Deposito
+    }else if (tipoc[0] == 'd'){//Deposito
+        puts("Efectuando Deposito")
         i = get_index_of(nombreint,C);
         C[i].nombre = nombreint;
+        printf("Nombre Recibido %s\n",nombreint);
         if (send(sckt_fd,"y",strlen("y"),0) != strlen("y")){
                 perror("Fallo en envio de confirmacion deposito.");
                 exit(1);
@@ -118,6 +120,7 @@ void procesar_transaccion(char *buffer,cajero C[],int sckt_fd, char *depotfile, 
         C[i].total += monto;
         fclose(fd_deposito);
     }
+    else
     fclose(fd_diario);
     //readline(fp,linea);
     //if(linea[0]!='\0'){
@@ -250,8 +253,8 @@ int main(int argc , char *argv[])
                     ntohs(address.sin_port));
         
             // Enviar mensaje de confirmacion.
-            printf("Vamo a procesar");
-            procesar_transaccion(buffer,clientes,sd,depotfile,retirfile);
+            printf("Vamo a procesar \n");
+            //procesar_transaccion(buffer,clientes,sd,depotfile,retirfile);
             // Agregar el socket a la lista.
             for (i = 0; i < MAXc; i++){
                 if( clientS[i] == 0 ){
@@ -266,7 +269,7 @@ int main(int argc , char *argv[])
             sd = clientS[i];
               
             if (FD_ISSET( sd , &readfds)){
-                printf("Hubo actividad");
+                printf("Hubo actividad\n");
                 if ((valread = read( sd , buffer, 1024)) == 0){
                     close( sd );
                     clientS[i] = 0;
