@@ -231,13 +231,21 @@ int main(int argc, char* argv[]){
 	printf("Mi nombre es: %s\n", nombre );
 
 	/*---------------------------------  Transaccion --------------------------*/
-	memset(buffer, '\0', sizeof buffer);						// Limpieza del buffer
 	sprintf(msj,"%s|%s|%s|%c|%s|",nombre,fecha,id,tipo,monto);  // Creacion del mensaje
 	send(clientSocket, msj,strlen(msj),0);						// Enviar mensaje
 	printf("Esperando respuesta del servidor...\n");			// Mensaje al Usuario.
+	if(nombre[0] == '-'){
+		memset(buffer, '\0', sizeof buffer);						// Limpieza del buffer
+		recv(clientSocket, buffer, 1024, 0);
+		sprintf(nombre,"%s",buffer);			
+	}
 	// Esperar respuesta del servidor 	
+	memset(buffer, '\0', sizeof buffer);						// Limpieza del buffer
 	recv(clientSocket, buffer, 1024, 0);	
+	printf("Mensaje: %s\n",buffer);		
 	printf("Mensaje: %s\n",buffer);								// Mostrar el mensaje.
+	
+
 	// Mostrar al usuario la respuesta del servidor.
 	if (buffer[1] == 'y'){
 		printf("Transaccion realizada con exito!\n");
