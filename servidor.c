@@ -13,7 +13,6 @@
 #include <netinet/in.h>
 #include <sys/time.h> //FD_SET, FD_ISSET, FD_ZERO macros
   
-#define PORT 8888
 #define MAXc 10
 
 typedef struct Cajeros{
@@ -100,6 +99,21 @@ void procesar_transaccion(char *buffer,cajero C[],int sckt_fd){
     BITACORA ENTRADA
     BITACORA SALIDA
  */
+void procesarArgumentos(char* argv[],char *port, char *entrada, char *salida){
+    for(int i = 1;i<=7;i+=2){
+        if(argv[i][1]=='l'){
+            sprintf(port,"%s",argv[i+1]);
+        }
+        else if((argv[i][1]=='i')){
+            sprintf(entrada,"%s",argv[i+1]);           
+        }            
+
+        else if(argv[i][1]=='l'){
+            sprintf(entrada,"%s",argv[i+1]);
+        }
+    }
+}
+
 int main(int argc , char *argv[])
 {
     /*---------------------- Declaracion de Variables -------------------*/
@@ -108,19 +122,25 @@ int main(int argc , char *argv[])
 
     // ENTEROS
     int opt = 1;
-    int masterS , addrlen , new_socket;
+    int masterS , addrlen , new_socket, PORT;
     int clientS[MAXc];
     int max_sd, activity, i , valread , sd;
 
     // STRINGS Y CARACTERES 
-    char buffer[1025];
+    char buffer[1025], entrada[1025], salida[1025], port[10];
     char *msj = "Conexion Satisfactoria. \n";
 
     // DESCRIPTORES.
     fd_set readfds;
 
     // SOCKETS
-    struct sockaddr_in address;   
+    struct sockaddr_in address;
+
+    /*-------------------------- Argumentos ------------------------------*/
+    procesarArgumentos(argv, port, entrada, salida);
+    PORT = atoi(port); 
+
+
 
     /*----------------------- Acondicionar el entorno --------------------*/
     for (i = 0; i < MAXc; i++){

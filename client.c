@@ -98,7 +98,6 @@ void writeLine(char * filename,char* id){
 
 void procesar_argumentos(char* srvr, char* port,char* op,char* monto, char* id,char* argv[]){
 	for(int i = 1;i<=9;i+=2){
-		printf("%d %s\n", i, argv[i]);
 		if(argv[i][1]=='d'){
 			srvr = (char *)malloc(sizeof(argv[i+1]));
 			sprintf(srvr,"%s",argv[i+1]);
