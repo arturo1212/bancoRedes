@@ -18,7 +18,7 @@
 #endif
 
 void getTime(char *buffer){
-	time_t timer;
+    time_t timer;
     struct tm* tm_info;
     time(&timer);
     tm_info = localtime(&timer);
@@ -87,176 +87,176 @@ int resolvDir(char* dir, char* ret){
 }
 
 void writeLine(char * filename,char* id){
-	int  result = 0;
-  	char buffer[10];
-  	FILE *fp;
-	fp = fopen(filename, "a+");
-	fprintf(fp, "%s\n", id);
-	fclose(fp);
+    int  result = 0;
+    char buffer[10];
+    FILE *fp;
+    fp = fopen(filename, "a+");
+    fprintf(fp, "%s\n", id);
+    fclose(fp);
 }
 
 
 void procesar_argumentos(char* srvr, char* port,char* op,char* monto, char* id,char* argv[]){
-	for(int i = 1;i<=9;i+=2){
-		if(argv[i][1]=='d'){
-			sprintf(srvr,"%s",argv[i+1]);
-		}else if(argv[i][1]=='p'){
-			sprintf(port,"%s",argv[i+1]);
+    for(int i = 1;i<=9;i+=2){
+        if(argv[i][1]=='d'){
+            sprintf(srvr,"%s",argv[i+1]);
+        }else if(argv[i][1]=='p'){
+            sprintf(port,"%s",argv[i+1]);
 
-		}else if (argv[i][1]=='c'){
-			sprintf(op,"%s",argv[i+1]);
+        }else if (argv[i][1]=='c'){
+            sprintf(op,"%s",argv[i+1]);
 
-		}else if (argv[i][1]=='m' && strlen(argv[i+1]) <= 5){
-			sprintf(monto,"%s",argv[i+1]);
+        }else if (argv[i][1]=='m' && strlen(argv[i+1]) <= 5){
+            sprintf(monto,"%s",argv[i+1]);
 
-		}else if (argv[i][1]=='i' && strlen(argv[i+1]) <= 20){
-			sprintf(id,"%s",argv[i+1]);
+        }else if (argv[i][1]=='i' && strlen(argv[i+1]) <= 20){
+            sprintf(id,"%s",argv[i+1]);
 
-		}else{
-			fprintf(stderr, "Opcion %s\n invalida.", argv[i]);
-			fprintf(stderr, "Uso: bsb_cli -d <ip servidor> -p <puerto> -c <operacion> \
-							 -m <monto> -i <identificador>\n" );
-			exit(1);
-		}
-	}
+        }else{
+            fprintf(stderr, "Opcion %s\n invalida.", argv[i]);
+            fprintf(stderr, "Uso: bsb_cli -d <ip servidor> -p <puerto> -c <operacion> \
+                             -m <monto> -i <identificador>\n" );
+            exit(1);
+        }
+    }
 }
 
 int main(int argc, char* argv[]){
-	/*---------------------- Declaracion de Variables -------------------------*/
-	/* STRINGS Y CARACTERES
-	  	ipsrvrstr : ip o nombre del servidor
-		puertostr : puerto del servidor
-		tipo	  : tipo de transaccion
-		monto	  : monto de la transaccion
-		id        : id del usuario
-		nombreReal: ip definitiva
-	*/
-	char ipsrvrstr[256],puertostr[256];
-	char tipo[5], monto[5],id[20], nombreReal[256],fecha[256];
-	char buffer[1024], msj[1024], linea[1024];	
-	char nombre[256];
-	char *localhost = "127.0.0.1";
-	// SOCKETS
-	struct sockaddr_in serverAddr;
-	struct timeval tv;
-	socklen_t addr_size;
+    /*---------------------- Declaracion de Variables -------------------------*/
+    /* STRINGS Y CARACTERES
+        ipsrvrstr : ip o nombre del servidor
+        puertostr : puerto del servidor
+        tipo      : tipo de transaccion
+        monto     : monto de la transaccion
+        id        : id del usuario
+        nombreReal: ip definitiva
+    */
+    char ipsrvrstr[256],puertostr[256];
+    char tipo[5], monto[5],id[20], nombreReal[256],fecha[256];
+    char buffer[1024], msj[1024], linea[1024];  
+    char nombre[256];
+    char *localhost = "127.0.0.1";
+    // SOCKETS
+    struct sockaddr_in serverAddr;
+    struct timeval tv;
+    socklen_t addr_size;
 
-	// TIMEOUT
-	tv.tv_sec = 10;
-	tv.tv_usec = 0;
-	
-	// ARCHIVOS
-	FILE *fp, *retiros;
+    // TIMEOUT
+    tv.tv_sec = 10;
+    tv.tv_usec = 0;
+    
+    // ARCHIVOS
+    FILE *fp, *retiros;
 
-	// ENTEROS
-	int clientSocket, total, puerto,PORT;	// Socket del cliente
+    // ENTEROS
+    int clientSocket, total, puerto,PORT;   // Socket del cliente
 
-	/*------------------------------ VERIFICACIONES ---------------------------*/
-	// Numero de argumentos
-	if (argc != 11){
-		fprintf(stderr, "Uso: bsb_cli -d <ip servidor> -p <puerto> -c <operacion> \
-							 -m <monto> -i <identificador>\n" );
-		exit(1);
-	}
-	// Obtener argumentos
-	procesar_argumentos(ipsrvrstr,puertostr,tipo,monto,id,argv);
-	if(strcmp(ipsrvrstr,localhost)){
-		resolvDir(ipsrvrstr, nombreReal);		
-	}
-	else{
-		sprintf(nombreReal,"%s",localhost);
-	}
+    /*------------------------------ VERIFICACIONES ---------------------------*/
+    // Numero de argumentos
+    if (argc != 11){
+        fprintf(stderr, "Uso: bsb_cli -d <ip servidor> -p <puerto> -c <operacion> \
+                             -m <monto> -i <identificador>\n" );
+        exit(1);
+    }
+    // Obtener argumentos
+    procesar_argumentos(ipsrvrstr,puertostr,tipo,monto,id,argv);
+    if(strcmp(ipsrvrstr,localhost)){
+        resolvDir(ipsrvrstr, nombreReal);       
+    }
+    else{
+        sprintf(nombreReal,"%s",localhost);
+    }
 
-	
-	// FECHA
-	getTime(fecha);
+    
+    // FECHA
+    getTime(fecha);
 
-	// RANGOS
-	printf("TIPO: %s\n", tipo);
-	/*
-	if( strcmp(tipo, "r") && strcmp(tipo, "d")){
-		printf("Opcion Incorrecta.");
-		exit(0);			
-	}
-	*/
-	if(atoi(monto)> 3000 || atoi(monto)<=0){
-		printf("Monto Invalido.");
-		exit(0);	
-	}
+    // RANGOS
+    printf("TIPO: %s\n", tipo);
+    /*
+    if( strcmp(tipo, "r") && strcmp(tipo, "d")){
+        printf("Opcion Incorrecta.");
+        exit(0);            
+    }
+    */
+    if(atoi(monto)> 3000 || atoi(monto)<=0){
+        printf("Monto Invalido.");
+        exit(0);    
+    }
 
-	// Ver, si es un retiro, si es el cuarto.
-	if(numRetiros("retiros.txt",id) >= 3 && tipo[0] == 'r'){
-		printf("No puede realizar mas retiros por hoy.");
-		exit(0);	
-	}
-	// Si es un retiro, agregarlo a la lista.
-	if(tipo == 'r'){
-		writeLine("retiros.txt",id);
-	}
+    // Ver, si es un retiro, si es el cuarto.
+    if(numRetiros("retiros.txt",id) >= 3 && tipo[0] == 'r'){
+        printf("No puede realizar mas retiros por hoy.");
+        exit(0);    
+    }
+    // Si es un retiro, agregarlo a la lista.
+    if(tipo == 'r'){
+        writeLine("retiros.txt",id);
+    }
 
-	/*--------------------------Establecer la conexion------------------------*/
-	// Creacion del socket.
-	if ( (clientSocket = socket(PF_INET, SOCK_STREAM, 0)) == 0){
+    /*--------------------------Establecer la conexion------------------------*/
+    // Creacion del socket.
+    if ( (clientSocket = socket(PF_INET, SOCK_STREAM, 0)) == 0){
         perror("Error creando el socket");
-        exit(EXIT_FAILURE);		
-	}
+        exit(EXIT_FAILURE);     
+    }
 
-	// Definimos el timeout en los sockets
-	setsockopt(clientSocket, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv));
-	//setsockopt(clientSocket, SOL_SOCKET, SO_SNDTIMEO, NULL,NULL);
-	//  Colocar los datos del servidor
-	serverAddr.sin_family = AF_INET;
-	serverAddr.sin_port = htons(atoi(puertostr));								// Cambiar puerto tambien
-	serverAddr.sin_addr.s_addr = inet_addr(nombreReal);						// CAMBIAR AQUI
-	memset(serverAddr.sin_zero, '\0', sizeof serverAddr.sin_zero);
+    // Definimos el timeout en los sockets
+    setsockopt(clientSocket, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv));
+    //setsockopt(clientSocket, SOL_SOCKET, SO_SNDTIMEO, NULL,NULL);
+    //  Colocar los datos del servidor
+    serverAddr.sin_family = AF_INET;
+    serverAddr.sin_port = htons(atoi(puertostr));                               // Cambiar puerto tambien
+    serverAddr.sin_addr.s_addr = inet_addr(nombreReal);                     // CAMBIAR AQUI
+    memset(serverAddr.sin_zero, '\0', sizeof serverAddr.sin_zero);
 
-	/*------------------------- Conexion con el servidor ---------------------*/
+    /*------------------------- Conexion con el servidor ---------------------*/
 
-	// Conectarse al servidor. 
-	addr_size = sizeof serverAddr;
-	if (connect(clientSocket, (struct sockaddr *) &serverAddr, addr_size) < 0){
+    // Conectarse al servidor. 
+    addr_size = sizeof serverAddr;
+    if (connect(clientSocket, (struct sockaddr *) &serverAddr, addr_size) < 0){
         perror("Error conectando al servidor");
-        exit(EXIT_FAILURE);			
-	}
-	/*------------------------------ Revision de nombre ----------------------*/
-	// Abrimos el archivo 
-	fp = fopen("cajeroV.txt", "r");
-	readline(fp,linea);
-	if(linea[0]!='\0'){
-		sprintf(nombre,"%s",linea);
-		//readline(fp,linea);
-	}
-	else{
-		sprintf(nombre,"-");
-	}
-	fclose(fp);
-	/*---------------------------------  Transaccion --------------------------*/
-	sprintf(msj,"%s|%s|%s|%s|%s|",nombre,fecha,id,tipo,monto);  // Creacion del mensaje
-		printf("MENSAJEEE %s\n",msj);
-	send(clientSocket, msj,strlen(msj),0);						// Enviar mensaje
-	// Esperar respuesta del servidor 	
-	// Esperar respuesta del servidor.
-	if (nombre[0]=='-'){
-		printf("Esperando Nombre...\n");				// Mensaje al Usuario.
-		memset(buffer, '\0', sizeof buffer);			// Limpiar el buffer
-		recv(clientSocket, buffer, 1024, 0);			// Recibir el mensaje.
-		writeLine("cajeroV.txt",buffer);
-		printf("Mi nombre es: %s\n", buffer );
-	}
+        exit(EXIT_FAILURE);         
+    }
+    /*------------------------------ Revision de nombre ----------------------*/
+    // Abrimos el archivo 
+    fp = fopen("cajeroV.txt", "r");
+    readline(fp,linea);
+    if(linea[0]!='\0'){
+        sprintf(nombre,"%s",linea);
+        //readline(fp,linea);
+    }
+    else{
+        sprintf(nombre,"-");
+    }
+    fclose(fp);
+    /*---------------------------------  Transaccion --------------------------*/
+    sprintf(msj,"%s|%s|%s|%s|%s|",nombre,fecha,id,tipo,monto);  // Creacion del mensaje
+        printf("MENSAJEEE %s\n",msj);
+    send(clientSocket, msj,strlen(msj),0);                      // Enviar mensaje
+    // Esperar respuesta del servidor   
+    // Esperar respuesta del servidor.
+    if (nombre[0]=='-'){
+        printf("Esperando Nombre...\n");                // Mensaje al Usuario.
+        memset(buffer, '\0', sizeof buffer);            // Limpiar el buffer
+        recv(clientSocket, buffer, 1024, 0);            // Recibir el mensaje.
+        writeLine("cajeroV.txt",buffer);
+        printf("Mi nombre es: %s\n", buffer );
+    }
 
-	memset(buffer, '\0', sizeof buffer);			// Limpiar el buffer
-	recv(clientSocket, buffer, 1024, 0);	
-	printf("Mensaje: %s\n",buffer);			
+    memset(buffer, '\0', sizeof buffer);            // Limpiar el buffer
+    recv(clientSocket, buffer, 1024, 0);    
+    printf("Mensaje: %s\n",buffer);         
 
-	// Mostrar al usuario la respuesta del servidor.
-	if (buffer[1] == 'y'){
-		printf("Transaccion realizada con exito!\n");
-		printf("Fecha: %s\n Operacion: %s\n ID: %s\n Monto: %s\n",
-				 fecha, tipo, id, monto );
-	}	
-	else{
-		printf("No hay dinero disponible actualmente.");
-	}
+    // Mostrar al usuario la respuesta del servidor.
+    if (buffer[1] == 'y'){
+        printf("Transaccion realizada con exito!\n");
+        printf("Fecha: %s\n Operacion: %s\n ID: %s\n Monto: %s\n",
+                 fecha, tipo, id, monto );
+    }   
+    else{
+        printf("No hay dinero disponible actualmente.");
+    }
 
   return 0;
 }

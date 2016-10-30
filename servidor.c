@@ -51,11 +51,16 @@ void procesar_transaccion(char *buffer,cajero C[],int sckt_fd, char *depotfile, 
     char nombre[20],fecha[16]/*o 17*/,id[20],tipoc[20],
          *tipor = "Retiro",
          *tipod = "Deposito";
-    char buffer2[1024];
+    char buffer2[20];
     int i,max, nombreint,monto;
     FILE *fd_diario,*fd_deposito,*fd_retiro;
-    sscanf(buffer,"%s|%s|%s|%s|%d|",nombre,fecha,id,tipoc,&monto);
-    printf("Estoy procesando una peticion:%s yyyyy %s\n", buffer, nombre);
+    sscanf(buffer,"%s | %s | %s | %s | %d",nombre,&fecha,&id,&tipoc,&monto);
+    printf("Estoy procesando una peticion\n");
+    puts(buffer);
+    puts(nombre);
+    puts(fecha);
+    puts(id);
+    printf("%d\n",monto);
     //RECORDAR QUE LOS ARCHIVOS DE AQUI SON PARAMENTROS DE LLAMADA
     //A EXCEPCION DEL DEIARIO
     if((fd_diario = fopen("logDiario.txt", "a+") )== NULL){//Ver Cambiar nombre por dia
@@ -63,16 +68,19 @@ void procesar_transaccion(char *buffer,cajero C[],int sckt_fd, char *depotfile, 
         exit(1);
     }
     if(nombre[0]=='-'){
-
+        puts("Asignando Nombre.");
         max = get_max_client(C);
         nombreint = max + 1;
         sprintf(buffer2,"%d",nombreint);
+        printf("Nuevo nombre %s\n",buffer2 );
         send(sckt_fd,buffer2,strlen(buffer2),0);
-
+        puts("Nombre enviado");
     }else{
         sscanf(nombre,"%d",&nombreint);
     }
+    printf("Tipo de trans: %s\n",tipoc);
     if (tipoc[0] == 'r'){ //Retiros
+        puts("Efectuando retiro");
         i = get_index_of(nombreint,C);
         C[i].nombre = nombreint;
         if(C[i].total > 5000){
@@ -99,6 +107,7 @@ void procesar_transaccion(char *buffer,cajero C[],int sckt_fd, char *depotfile, 
             //Negado y mandamos rial (?)
         }
     }else if (tipoc[0] == 'd'){//Deposito
+        puts("Efectuando Deposito");
         i = get_index_of(nombreint,C);
         C[i].nombre = nombreint;
         printf("Nombre Recibido %s\n",nombreint);
@@ -261,7 +270,7 @@ int main(int argc , char *argv[])
             sd = clientS[i];
               
             if (FD_ISSET( sd , &readfds)){
-                printf("Hubo actividad");
+                printf("Hubo actividad\n");
                 if ((valread = read( sd , buffer, 1024)) == 0){
                     close( sd );
                     clientS[i] = 0;
