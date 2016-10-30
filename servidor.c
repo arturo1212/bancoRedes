@@ -104,8 +104,8 @@ void procesar_transaccion(char *buffer,cajero C[],int sckt_fd, char *depotfile, 
             perror("Error abriendo log deposito.");
             exit(1);
         }
-        fprintf(fd_diario,"%s por el usurio %s de monto %d el %s en el cajero %d\n",tipod,id,monto,fecha,C[i].nombre);
-        fprintf(fd_deposito,"%s por el usurio %s de monto %d el %s en el cajero %d\n",tipod,id,monto,fecha,C[i].nombre);
+        fprintf(fd_diario,"%s por el usuario %s de monto %d el %s en el cajero %d\n",tipod,id,monto,fecha,C[i].nombre);
+        fprintf(fd_deposito,"%s por el usuario %s de monto %d el %s en el cajero %d\n",tipod,id,monto,fecha,C[i].nombre);
         C[i].total += monto;
         fclose(fd_deposito);
     }
