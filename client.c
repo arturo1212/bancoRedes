@@ -134,7 +134,7 @@ int main(int argc, char* argv[]){
 	char ipsrvrstr[256],puertostr[256];
 	char tipo, monto[5],id[20], nombreReal[256],fecha[256];
 	char buffer[1024], msj[1024], linea[1024];	
-	char *nombre;
+	char nombre[20];
 
 	// SOCKETS
 	struct sockaddr_in serverAddr;
@@ -197,7 +197,7 @@ int main(int argc, char* argv[]){
 
 	// Definimos el timeout en los sockets
 	setsockopt(clientSocket, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv));
-	//setsockopt(clientSocket, SOL_SOCKET, SO_SNDTIMEO, NULL,NULL);
+	setsockopt(clientSocket, SOL_SOCKET, SO_SNDTIMEO, &tv, sizeof(tv));
 	//  Colocar los datos del servidor
 	serverAddr.sin_family = AF_INET;
 	serverAddr.sin_port = htons(atoi(puertostr));								// Cambiar puerto tambien
@@ -221,11 +221,12 @@ int main(int argc, char* argv[]){
 		//readline(fp,linea);
 	}
 	else{
-		nombre = "-";
+		memset(nombre,0,sizeof nombre);
+		nombre[0] = '-';
 	}
-
+	printf("%c\n",tipo);
 	/*---------------------------------  Transaccion --------------------------*/
-	sprintf(msj,"%s|%s|%s|%c|%s|",nombre,fecha,id,tipo,monto);  // Creacion del mensaje
+	sprintf(msj,"%s|%s|%s|%s|%s|",nombre,fecha,id,tipo,monto);  // Creacion del mensaje
 	send(clientSocket, msj,strlen(msj),0);						// Enviar mensaje
 	printf("Esperando respuesta del servidor...\n");			// Mensaje al Usuario.
 	// Esperar respuesta del servidor 	
@@ -233,19 +234,20 @@ int main(int argc, char* argv[]){
 	memset(buffer, '\0', sizeof buffer);			// Limpiar el buffer
 	
 	if (nombre[0]=='-'){
+		puts("No tengo nombre");
 		if (recv(clientSocket, buffer, 1024, 0)<0){			// Recibir el mensaje.
 			perror("No se recibe respuesta");		
         	exit(EXIT_FAILURE);
     	}
+    	puts("Ya tengo nombre");
 		sprintf(nombre,"%s",buffer);
 		writeLine("cajeroV.txt",nombre);
 	}
-
+	printf("Mi nombre es: %s\n", nombre );
 	if (recv(clientSocket, buffer, 1024, 0)<0){	
         perror("No se recibe respuesta");		
         exit(EXIT_FAILURE);			
 	}
-	printf("Mi nombre es: %s\n", nombre );
 	// Esperar respuesta del servidor 	
 	memset(buffer, '\0', sizeof buffer);						// Limpieza del buffer
 	recv(clientSocket, buffer, 1024, 0);	
