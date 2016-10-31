@@ -110,6 +110,7 @@ void procesar_transaccion(char *buffer,cajero C[],int sckt_fd, char *depotfile, 
     }else if (tipoc[0] == 'd'){//Deposito
         puts("Efectuando Deposito");
         i = get_index_of(nombreint,C);
+        printf("Todo bien YOLO \n");
         C[i].nombre = nombreint;
         printf("Nombre Recibido %s\n",nombreint);
         if (send(sckt_fd,"y",strlen("y"),0) != strlen("y")){
