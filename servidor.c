@@ -52,10 +52,11 @@ void procesar_transaccion(char *buffer,cajero C[],int sckt_fd, char *depotfile, 
          *tipor = "Retiro",
          *tipod = "Deposito";
     char buffer2[20];
-    int i,max, nombreint,monto;
+    int i,max, nombreint,monto,name;
     FILE *fd_diario,*fd_deposito,*fd_retiro;
-    sscanf(buffer,"%s | %s | %s | %s | %d",nombre,&fecha,&id,&tipoc,&monto);
+    sscanf(buffer,"%d | %s | %s | %s | %d",&name,fecha,id,tipoc,&monto);
     printf("Estoy procesando una peticion\n");
+    sprintf(nombre,"%d", name);
     puts(buffer);
     puts(nombre);
     puts(fecha);
