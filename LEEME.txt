@@ -77,3 +77,8 @@ Condiciones particulares:
 	- Se asume que el cajero no admite depósitos mayores a 3000.
 	- Basados en las respuestas a las dudas planteadas en clases, no existe un mecanismo de recarga
 	para los cajeros que estan por debajo de 5000.
+	- Como el enunciado dice explicitamente que las personas pueden sacar un máximo de 3 veces, se
+	decidió limitar el número de retiros (por siempre) por persona en cada cajero.
+	- Se toma el dia completo para el cierre.
+	- A lo largo del dia se escriben las transacciones por seguridad.
+	- Al final de cada dia se reinicia el monto Total de todos los cajeros a 80000.
