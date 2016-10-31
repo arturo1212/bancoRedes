@@ -177,8 +177,8 @@ int main(int argc, char* argv[]){
 		printf("Opcion Incorrecta.");
 		exit(0);			
 	}
-	
-	if(atoi(monto)> 3000 || atoi(monto)<=0){
+	// Ver si el monto es valido
+	if(atoi(monto)> 3000 || atoi(monto)<0){
 		printf("Monto Invalido.\n");
 		exit(0);	
 	}
