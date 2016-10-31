@@ -29,7 +29,6 @@ void inicializar (cajero C[]){
 
 int get_index_of(int name, cajero C[]){
     for (int i = 0;i<MAXc;i++){
-        puts("FOR");
         if(C[i].nombre == name){
             return i;
         }
@@ -83,8 +82,12 @@ void procesar_transaccion(char *buffer,cajero C[],int sckt_fd, char *depotfile, 
     if (tipoc[0] == 'r'){ //Retiros
         puts("Efectuando retiro");
         i = get_index_of(nombreint,C);
+        if(i == - 1){
+            i = get_index_of(0,C);
+        }
         C[i].nombre = nombreint;
         if(C[i].total > 5000){
+            printf("Si hay dinero %d\n",C[i].total);
             //Enviamos mensaje de confirmacion
             if (send(sckt_fd,"y",strlen("y"),0) != strlen("y")){
                 perror("Fallo en envio de confirmacion retiro.");
@@ -101,7 +104,8 @@ void procesar_transaccion(char *buffer,cajero C[],int sckt_fd, char *depotfile, 
             //Actualizamos total
             C[i].total -= monto;
         }else{ // NO HAY RIAL
-            if (send(sckt_fd,"n",strlen("y"),0) != strlen("n")){
+            printf("No hay dinero %d\n",C[i].total);
+            if (send(sckt_fd,"n",strlen("n"),0) != strlen("n")){
                 perror("Fallo en envio de negacion retiro.");
                 exit(1);
             }
@@ -176,6 +180,7 @@ int main(int argc , char *argv[])
     // SOCKETS
     struct sockaddr_in address;
 
+    inicializar(clientes);
     /*-------------------------- Argumentos ------------------------------*/
     if (argc != 7){
         fprintf(stderr, "Uso: bsb_srvr -l <puerto> -i <bitacora depositos> -c <bitacora retiro>\n");
