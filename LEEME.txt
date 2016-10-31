@@ -74,3 +74,6 @@ Condiciones particulares:
 	- Para cada posible fallo se muestra el mensaje de error correspondiente.
 	- Se asume que no hay monto tope para la cantidad de depósitos que pueden hacerse.
 	- El servidor admite un máximo de 10 conexiones simultáneas.
+	- Se asume que el cajero no admite depósitos mayores a 3000.
+	- Basados en las respuestas a las dudas planteadas en clases, no existe un mecanismo de recarga
+	para los cajeros que estan por debajo de 5000.
