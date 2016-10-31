@@ -28,7 +28,8 @@ void inicializar (cajero C[]){
 }
 
 int get_index_of(int name, cajero C[]){
-    for (int i = 0;i<MAXc;i++){
+    int i = 0;
+    for (;i<MAXc;i++){
         if(C[i].nombre == name){
             return i;
         }
@@ -58,7 +59,7 @@ void procesar_transaccion(char *buffer,cajero C[],int sckt_fd, char *depotfile, 
     sprintf(nombre,"%d", name);
     //RECORDAR QUE LOS ARCHIVOS DE AQUI SON PARAMENTROS DE LLAMADA
     //A EXCEPCION DEL DEIARIO
-    if((fd_diario = fopen("logDiario.txt", "a+") )== NULL){//Ver Cambiar nombre por dia
+    if((fd_diario = fopen("logDiario", "a+") )== NULL){//Ver Cambiar nombre por dia
         perror("Error abriendo log diario.");
         exit(1);
     }
@@ -132,7 +133,8 @@ void procesar_transaccion(char *buffer,cajero C[],int sckt_fd, char *depotfile, 
 }
 
 void procesarArgumentos(char* argv[],char *port, char *depotfile, char *retirfile){
-    for(int i = 1;i<=5;i+=2){
+    int i = 1;
+    for(;i<=5;i+=2){
         if(argv[i][1]=='l'){
             sprintf(port,"%s",argv[i+1]);
         }
