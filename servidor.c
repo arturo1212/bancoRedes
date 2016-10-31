@@ -79,6 +79,7 @@ void procesar_transaccion(char *buffer,cajero C[],int sckt_fd, char *depotfile, 
         }
         C[i].nombre = nombreint;
         if(C[i].total > 5000){
+            printf("Si hay dinero %d\n",C[i].total);
             //Enviamos mensaje de confirmacion
             if (send(sckt_fd,"y",strlen("y"),0) != strlen("y")){
                 perror("Fallo en envio de confirmacion retiro.");
@@ -95,8 +96,10 @@ void procesar_transaccion(char *buffer,cajero C[],int sckt_fd, char *depotfile, 
             fclose(fd_retiro);
             //Actualizamos total
             C[i].total -= monto;
-        }else{ // Sin dinero
-            if (send(sckt_fd,"n",strlen("y"),0) != strlen("n")){
+
+        }else{ // NO HAY RIAL
+            printf("No hay dinero %d\n",C[i].total);
+            if (send(sckt_fd,"n",strlen("n"),0) != strlen("n")){
                 perror("Fallo en envio de negacion retiro.");
                 exit(1);
             }
@@ -179,6 +182,7 @@ int main(int argc , char *argv[])
     // TIEMPO
     clock_t end;
     clock_t begin;
+    inicializar(clientes);
     /*-------------------------- Argumentos ------------------------------*/
     if (argc != 7){
         fprintf(stderr, "Uso: bsb_srvr -l <puerto> -i <bitacora depositos> -c <bitacora retiro>\n");
