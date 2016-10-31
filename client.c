@@ -219,7 +219,6 @@ int main(int argc, char* argv[]){
 	fp = fopen("cajeroV.txt", "a+");
 	readline(fp,linea);
 	if(linea[0]!='\0'){
-		printf("TIPO: %s\n", tipo);
 		sprintf(nombre,"%s",linea);
 		//readline(fp,linea);
 	}
