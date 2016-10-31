@@ -188,11 +188,7 @@ int main(int argc, char* argv[]){
 		printf("No puede realizar mas retiros por hoy.");
 		exit(0);	
 	}
-	// Si es un retiro, agregarlo a la lista.
 
-	if(tipo[0] == 'r'){
-		writeLine("retiros.txt",id);
-	}
 
 	/*--------------------------Establecer la conexion------------------------*/
 	// Creacion del socket.
@@ -260,6 +256,9 @@ int main(int argc, char* argv[]){
 		printf("Transaccion realizada con exito!\n");
 		printf("Fecha: %s\n Operacion: %s\n ID: %s\n Monto: %s\n",
 				 fecha, tipo, id, monto );
+		if(tipo[0] == 'r'){
+			writeLine("retiros.txt",id);
+	}
 	}	
 	else{
 		printf("No hay dinero disponible actualmente.");
