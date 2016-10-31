@@ -234,12 +234,10 @@ int main(int argc, char* argv[]){
 	// Esperar respuesta del servidor.
 	if (nombre[0]=='0'){
 		memset(buffer, '\0', sizeof buffer);			// Limpiar el buffer
-		puts("No tengo nombre");
 		if (recv(clientSocket, buffer, 1024, 0)<0){			// Recibir el mensaje.
 			perror("No se recibe respuesta");		
         	exit(EXIT_FAILURE);
     	}
-    	puts("Ya tengo nombre");
 		sprintf(nombre,"%s",buffer);
 		writeLine("cajeroV.txt",nombre);
 	}
@@ -250,7 +248,6 @@ int main(int argc, char* argv[]){
         perror("No se recibe respuesta");		
         exit(EXIT_FAILURE);			
 	}			
-	printf("mensaje %s\n", buffer );
 	// Mostrar al usuario la respuesta del servidor.
 	if (buffer[0] == 'y'){
 		printf("Transaccion realizada con exito!\n");
@@ -261,7 +258,7 @@ int main(int argc, char* argv[]){
 	}
 	}	
 	else{
-		printf("No hay dinero disponible actualmente.");
+		printf("No hay dinero disponible actualmente.\n");
 	}
 
   return 0;

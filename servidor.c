@@ -1,7 +1,7 @@
 /**
     Handle multiple socket connections with select and fd_set on Linux
 */
-  
+#include <time.h>
 #include <stdio.h>
 #include <string.h>   //strlen
 #include <stdlib.h>
@@ -14,6 +14,7 @@
 #include <sys/time.h> //FD_SET, FD_ISSET, FD_ZERO macros
   
 #define MAXc 10
+
 
 typedef struct Cajeros{
     int total,nombre;
@@ -46,6 +47,7 @@ int get_max_client(cajero C[]){
     return max;
 }
 
+// Funcion que procesa las transacciones para cada cajero
 void procesar_transaccion(char *buffer,cajero C[],int sckt_fd, char *depotfile, char * retirfile){
     char nombre[20],fecha[16]/*o 17*/,id[20],tipoc[20],
          *tipor = "Retiro",
@@ -54,7 +56,6 @@ void procesar_transaccion(char *buffer,cajero C[],int sckt_fd, char *depotfile, 
     int i,max, nombreint,monto,name;
     FILE *fd_diario,*fd_deposito,*fd_retiro;
     sscanf(buffer,"%d | %s | %s | %s | %d",&name,fecha,id,tipoc,&monto);
-    printf("Estoy procesando una peticion\n");
     sprintf(nombre,"%d", name);
     //RECORDAR QUE LOS ARCHIVOS DE AQUI SON PARAMENTROS DE LLAMADA
     //A EXCEPCION DEL DEIARIO
@@ -70,7 +71,6 @@ void procesar_transaccion(char *buffer,cajero C[],int sckt_fd, char *depotfile, 
     }else{
         sscanf(nombre,"%d",&nombreint);
     }
-    printf("Tipo de trans: %s\n",tipoc);
     if (tipoc[0] == 'r'){ //Retiros
         i = get_index_of(nombreint,C);
         if(i == - 1){
@@ -88,20 +88,20 @@ void procesar_transaccion(char *buffer,cajero C[],int sckt_fd, char *depotfile, 
                 exit(1);
             }
             //Escribimos en la bitacora
+            printf("%s por el usurio %s de monto %d el %s en el cajero %d\n",tipor,id,monto,fecha,C[i].nombre);
             fprintf(fd_diario,"%s por el usurio %s de monto %d el %s en el cajero %d\n",tipor,id,monto,fecha,C[i].nombre);
             fprintf(fd_retiro,"%s por el usurio %s de monto %d el %s en el cajero %d\n",tipor,id,monto,fecha,C[i].nombre);
             fclose(fd_retiro);
             //Actualizamos total
             C[i].total -= monto;
-        }else{ // NO HAY RIAL
+        }else{ // Sin dinero
             if (send(sckt_fd,"n",strlen("y"),0) != strlen("n")){
                 perror("Fallo en envio de negacion retiro.");
                 exit(1);
             }
-            //Negado y mandamos rial (?)
         }
     }else if (tipoc[0] == 'd'){//Deposito
-        puts("Efectuando Deposito");
+
         i = get_index_of(nombreint,C);
         if(i == - 1){
             i = get_index_of(0,C);
@@ -115,6 +115,8 @@ void procesar_transaccion(char *buffer,cajero C[],int sckt_fd, char *depotfile, 
             perror("Error abriendo log deposito.");
             exit(1);
         }
+        // Mostrar resultados y guardar
+        printf("%s por el usurio %s de monto %d el %s en el cajero %d\n",tipod,id,monto,fecha,C[i].nombre);
         fprintf(fd_diario,"%s por el usuario %s de monto %d el %s en el cajero %d\n",tipod,id,monto,fecha,C[i].nombre);
         fprintf(fd_deposito,"%s por el usuario %s de monto %d el %s en el cajero %d\n",tipod,id,monto,fecha,C[i].nombre);
         C[i].total += monto;
@@ -149,7 +151,10 @@ int main(int argc , char *argv[])
     /*---------------------- Declaracion de Variables -------------------*/
     //ARREGLO DE CLIENTES
     cajero clientes[MAXc];
-
+    
+    // ARCHIVO
+    FILE *fp;
+    
     // ENTEROS
     int opt = 1;
     int masterS , addrlen , new_socket, PORT;
@@ -166,6 +171,12 @@ int main(int argc , char *argv[])
     // SOCKETS
     struct sockaddr_in address;
 
+    // DOUBLE
+    double time_spent;
+
+    // TIEMPO
+    clock_t end;
+    clock_t begin;
     /*-------------------------- Argumentos ------------------------------*/
     if (argc != 7){
         fprintf(stderr, "Uso: bsb_srvr -l <puerto> -i <bitacora depositos> -c <bitacora retiro>\n");
@@ -173,7 +184,6 @@ int main(int argc , char *argv[])
     }
     procesarArgumentos(argv, port, depotfile, retirfile);
     PORT = atoi(port); 
-    puts("Pase por aqui");
 
 
     /*----------------------- Acondicionar el entorno --------------------*/
@@ -214,8 +224,22 @@ int main(int argc , char *argv[])
     addrlen = sizeof(address);
     puts("Esperando conexiones");
     
+    // Medir tiempo
+    begin = clock();
+
+    
+
+
     /*----------------------------- Monitorear --------------------------*/
     while(1){
+        end = clock();
+        time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+        // si paso un dia, 
+        if(time_spent >= 86400){
+            begin = clock();
+            fp = fopen("logDiario.txt","w+");
+            fclose(fp);
+        }
         FD_ZERO(&readfds);          // Limpiar el conjunto de sockets
         FD_SET(masterS, &readfds);  // Agregar socket maestro
         max_sd = masterS;           // Actualizar descriptor mas grande
