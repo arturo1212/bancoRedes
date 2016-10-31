@@ -97,7 +97,7 @@ void writeLine(char * filename,char* id){
 
 
 void procesar_argumentos(char* srvr, char* port,char* op,char* monto, char* id,char* argv[]){
-	int i
+	int i;
 	for( i= 1;i<=9;i+=2){
 		if(argv[i][1]=='d'){
 			sprintf(srvr,"%s",argv[i+1]);
