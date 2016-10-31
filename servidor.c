@@ -68,7 +68,7 @@ void procesar_transaccion(char *buffer,cajero C[],int sckt_fd, char *depotfile, 
         perror("Error abriendo log diario.");
         exit(1);
     }
-    if(nombre[0]=='-'){
+    if(nombre[0]=='0'){
         puts("Asignando Nombre.");
         max = get_max_client(C);
         nombreint = max + 1;
@@ -111,7 +111,11 @@ void procesar_transaccion(char *buffer,cajero C[],int sckt_fd, char *depotfile, 
         puts("Efectuando Deposito");
         i = get_index_of(nombreint,C);
         printf("Todo bien YOLO \n");
-        C[i].nombre = nombreint;
+        if(i == - 1){
+            i = get_index_of(0,C);
+        }
+        printf("NOMBRE NUEVO: %d\n",i);
+        C[0].nombre = nombreint;
         printf("Nombre Recibido %s\n",nombreint);
         if (send(sckt_fd,"y",strlen("y"),0) != strlen("y")){
                 perror("Fallo en envio de confirmacion deposito.");
@@ -185,6 +189,7 @@ int main(int argc , char *argv[])
     /*----------------------- Acondicionar el entorno --------------------*/
     for (i = 0; i < MAXc; i++){
         clientS[i] = 0;
+        clientes[i].nombre = 0;
     }
       
     // SOCKET:Creacion de socket maestro
