@@ -40,7 +40,7 @@ int get_index_of(int name, cajero C[]){
 
 int get_max_client(cajero C[]){
     int i = 0,max = 0;
-    for (;i>MAXc;i++){
+    for (;i<MAXc;i++){
         if(max < C[i].nombre ){
             max = C[i].nombre;
         }
@@ -66,6 +66,7 @@ void procesar_transaccion(char *buffer,cajero C[],int sckt_fd, char *depotfile, 
     }
     if(nombre[0]=='0'){
         max = get_max_client(C);
+        printf("%d\n",max);
         nombreint = max + 1;
         sprintf(buffer2,"%d\n",nombreint);
         send(sckt_fd,buffer2,strlen(buffer2),0);
