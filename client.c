@@ -232,6 +232,7 @@ int main(int argc, char* argv[]){
 	send(clientSocket, msj,strlen(msj),0);						// Enviar mensaje
 	// Esperar respuesta del servidor 	
 	// Esperar respuesta del servidor.
+	printf("Mensaje: %s\n",msj);
 	if (nombre[0]=='0'){
 		memset(buffer, '\0', sizeof buffer);			// Limpiar el buffer
 		if (recv(clientSocket, buffer, 1024, 0)<0){			// Recibir el mensaje.

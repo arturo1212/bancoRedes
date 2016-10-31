@@ -67,10 +67,12 @@ void procesar_transaccion(char *buffer,cajero C[],int sckt_fd, char *depotfile, 
     if(nombre[0]=='0'){
         max = get_max_client(C);
         nombreint = max + 1;
-        sprintf(buffer2,"%d",nombreint);
+        sprintf(buffer2,"%d\n",nombreint);
         send(sckt_fd,buffer2,strlen(buffer2),0);
+        usleep(500);
     }else{
         sscanf(nombre,"%d",&nombreint);
+
     }
     if (tipoc[0] == 'r'){ //Retiros
         i = get_index_of(nombreint,C);
@@ -232,9 +234,6 @@ int main(int argc , char *argv[])
     
     // Medir tiempo
     begin = clock();
-
-    
-
 
     /*----------------------------- Monitorear --------------------------*/
     while(1){
