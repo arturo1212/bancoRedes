@@ -258,7 +258,7 @@ int main(int argc, char* argv[]){
 	printf("Mensaje: %s\n",buffer);			
 
 	// Mostrar al usuario la respuesta del servidor.
-	if (buffer[1] == 'y'){
+	if (buffer[0] == 'y'){
 		printf("Transaccion realizada con exito!\n");
 		printf("Fecha: %s\n Operacion: %s\n ID: %s\n Monto: %s\n",
 				 fecha, tipo, id, monto );

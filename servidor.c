@@ -28,8 +28,8 @@ void inicializar (cajero C[]){
 }
 
 int get_index_of(int name, cajero C[]){
-    int i = 0;
-    for (;i>MAXc;i++){
+    for (int i = 0;i<MAXc;i++){
+        puts("FOR");
         if(C[i].nombre == name){
             return i;
         }
@@ -115,8 +115,8 @@ void procesar_transaccion(char *buffer,cajero C[],int sckt_fd, char *depotfile, 
             i = get_index_of(0,C);
         }
         printf("NOMBRE NUEVO: %d\n",i);
-        C[0].nombre = nombreint;
-        printf("Nombre Recibido %s\n",nombreint);
+        C[i].nombre = nombreint;
+        printf("Nombre Recibido %d\n",nombreint);
         if (send(sckt_fd,"y",strlen("y"),0) != strlen("y")){
                 perror("Fallo en envio de confirmacion deposito.");
                 exit(1);
