@@ -82,3 +82,5 @@ Condiciones particulares:
 	- Se toma el dia completo para el cierre.
 	- A lo largo del dia se escriben las transacciones por seguridad.
 	- Al final de cada dia se reinicia el monto Total de todos los cajeros a 80000.
+	- Se agregó un sleep en el procesamiento de las transacciones para simular el breve retraso
+	de los servidores al operar.
