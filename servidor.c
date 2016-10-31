@@ -213,7 +213,7 @@ int main(int argc , char *argv[])
         exit(EXIT_FAILURE);
     }
     address.sin_family = AF_INET;           // Familia
-    address.sin_addr.s_addr = INADDR_ANY;   // Todas mis interfaces.
+    address.sin_addr.s_addr = htonl(INADDR_ANY);   // Todas mis interfaces.
     address.sin_port = htons(PORT);         // Puerto especificado.
       
     // BIND: Asociamos el socket a la direccion especificada. 
