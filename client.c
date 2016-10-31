@@ -174,7 +174,7 @@ int main(int argc, char* argv[]){
 	// RANGOS
 	
 	if( tipo[0] != 'r' && tipo[0]!='d'){
-		printf("Opcion Incorrecta.");
+		printf("Opcion Incorrecta.\n");
 		exit(0);			
 	}
 	
@@ -185,7 +185,7 @@ int main(int argc, char* argv[]){
 
 	// Ver, si es un retiro, si es el cuarto.
 	if(numRetiros("retiros.txt",id) >= 3 && tipo[0] == 'r'){
-		printf("No puede realizar mas retiros por hoy.");
+		printf("No puede realizar mas retiros por hoy.\n");
 		exit(0);	
 	}
 	// Si es un retiro, agregarlo a la lista.
