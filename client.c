@@ -190,6 +190,7 @@ int main(int argc, char* argv[]){
 		exit(0);	
 	}
 	// Si es un retiro, agregarlo a la lista.
+
 	if(tipo[0] == 'r'){
 		writeLine("retiros.txt",id);
 	}
@@ -220,14 +221,15 @@ int main(int argc, char* argv[]){
 	}
 	/*------------------------------ Revision de nombre ----------------------*/
 	// Abrimos el archivo 
-	fp = fopen("cajeroV.txt", "r");
+	fp = fopen("cajeroV.txt", "a+");
 	readline(fp,linea);
 	if(linea[0]!='\0'){
+		printf("TIPO: %s\n", tipo);
 		sprintf(nombre,"%s",linea);
 		//readline(fp,linea);
 	}
 	else{
-		sprintf(nombre,"-");
+		sprintf(nombre,"0");
 	}
 	fclose(fp);
 	/*---------------------------------  Transaccion --------------------------*/
@@ -235,7 +237,7 @@ int main(int argc, char* argv[]){
 	send(clientSocket, msj,strlen(msj),0);						// Enviar mensaje
 	// Esperar respuesta del servidor 	
 	// Esperar respuesta del servidor.
-	if (nombre[0]=='-'){
+	if (nombre[0]=='0'){
 		memset(buffer, '\0', sizeof buffer);			// Limpiar el buffer
 		puts("No tengo nombre");
 		if (recv(clientSocket, buffer, 1024, 0)<0){			// Recibir el mensaje.
