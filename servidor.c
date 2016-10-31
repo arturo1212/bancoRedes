@@ -123,7 +123,6 @@ void procesar_transaccion(char *buffer,cajero C[],int sckt_fd, char *depotfile, 
         C[i].total += monto;
         fclose(fd_deposito);
     }
-    else
     fclose(fd_diario);
     //readline(fp,linea);
     //if(linea[0]!='\0'){
