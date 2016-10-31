@@ -56,11 +56,6 @@ void procesar_transaccion(char *buffer,cajero C[],int sckt_fd, char *depotfile, 
     sscanf(buffer,"%d | %s | %s | %s | %d",&name,fecha,id,tipoc,&monto);
     printf("Estoy procesando una peticion\n");
     sprintf(nombre,"%d", name);
-    puts(buffer);
-    puts(nombre);
-    puts(fecha);
-    puts(id);
-    printf("%d\n",monto);
     //RECORDAR QUE LOS ARCHIVOS DE AQUI SON PARAMENTROS DE LLAMADA
     //A EXCEPCION DEL DEIARIO
     if((fd_diario = fopen("logDiario.txt", "a+") )== NULL){//Ver Cambiar nombre por dia
@@ -68,19 +63,15 @@ void procesar_transaccion(char *buffer,cajero C[],int sckt_fd, char *depotfile, 
         exit(1);
     }
     if(nombre[0]=='0'){
-        puts("Asignando Nombre.");
         max = get_max_client(C);
         nombreint = max + 1;
         sprintf(buffer2,"%d",nombreint);
-        printf("Nuevo nombre %s\n",buffer2 );
         send(sckt_fd,buffer2,strlen(buffer2),0);
-        puts("Nombre enviado");
     }else{
         sscanf(nombre,"%d",&nombreint);
     }
     printf("Tipo de trans: %s\n",tipoc);
     if (tipoc[0] == 'r'){ //Retiros
-        puts("Efectuando retiro");
         i = get_index_of(nombreint,C);
         if(i == - 1){
             i = get_index_of(0,C);
@@ -114,13 +105,10 @@ void procesar_transaccion(char *buffer,cajero C[],int sckt_fd, char *depotfile, 
     }else if (tipoc[0] == 'd'){//Deposito
         puts("Efectuando Deposito");
         i = get_index_of(nombreint,C);
-        printf("Todo bien YOLO \n");
         if(i == - 1){
             i = get_index_of(0,C);
         }
-        printf("NOMBRE NUEVO: %d\n",i);
         C[i].nombre = nombreint;
-        printf("Nombre Recibido %d\n",nombreint);
         if (send(sckt_fd,"y",strlen("y"),0) != strlen("y")){
                 perror("Fallo en envio de confirmacion deposito.");
                 exit(1);
@@ -195,6 +183,7 @@ int main(int argc , char *argv[])
     for (i = 0; i < MAXc; i++){
         clientS[i] = 0;
         clientes[i].nombre = 0;
+        clientes[i].total = 80000;
     }
       
     // SOCKET:Creacion de socket maestro
@@ -282,7 +271,6 @@ int main(int argc , char *argv[])
             sd = clientS[i];
               
             if (FD_ISSET( sd , &readfds)){
-                printf("Hubo actividad\n");
                 if ((valread = read( sd , buffer, 1024)) == 0){
                     close( sd );
                     clientS[i] = 0;
@@ -290,9 +278,6 @@ int main(int argc , char *argv[])
                 else
                 {   
                     procesar_transaccion(buffer,clientes,sd,depotfile,retirfile);
-                    //buffer[valread] = '\0';
-                    //puts(buffer);
-                    //send(sd , buffer , strlen(buffer) , 0 );
                 }
             }
         }

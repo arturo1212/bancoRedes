@@ -172,15 +172,14 @@ int main(int argc, char* argv[]){
 	getTime(fecha);
 
 	// RANGOS
-	printf("TIPO: %s\n", tipo);
-	/*
-	if( strcmp(tipo, "r") && strcmp(tipo, "d")){
+	
+	if( tipo[0] != 'r' && tipo[0]!='d'){
 		printf("Opcion Incorrecta.");
 		exit(0);			
 	}
-	*/
+	
 	if(atoi(monto)> 3000 || atoi(monto)<=0){
-		printf("Monto Invalido.");
+		printf("Monto Invalido.\n");
 		exit(0);	
 	}
 
@@ -248,15 +247,14 @@ int main(int argc, char* argv[]){
 		sprintf(nombre,"%s",buffer);
 		writeLine("cajeroV.txt",nombre);
 	}
-	printf("Mi nombre es: %s\n", nombre );
+
 	
 	//Esperar respuesta del servidor
 	if (recv(clientSocket, buffer, 1024, 0)<0){	
         perror("No se recibe respuesta");		
         exit(EXIT_FAILURE);			
-	}
-	printf("Mensaje: %s\n",buffer);			
-
+	}			
+	printf("mensaje %s\n", buffer );
 	// Mostrar al usuario la respuesta del servidor.
 	if (buffer[0] == 'y'){
 		printf("Transaccion realizada con exito!\n");
