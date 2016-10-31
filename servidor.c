@@ -245,6 +245,7 @@ int main(int argc , char *argv[])
             begin = clock();
             fp = fopen("logDiario.txt","w+");
             fclose(fp);
+            inicializar(clientes);
         }
         FD_ZERO(&readfds);          // Limpiar el conjunto de sockets
         FD_SET(masterS, &readfds);  // Agregar socket maestro
